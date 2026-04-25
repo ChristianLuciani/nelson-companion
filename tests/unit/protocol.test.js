@@ -24,6 +24,18 @@ global.fetch = jest.fn(() =>
   }) })
 );
 
+global.DB = (() => {
+  const checks = {};
+  const vitals = {};
+  return {
+    isChecked:        (slotId, medIdx) => !!checks[`${slotId}_${medIdx}`],
+    toggleCheck:      (slotId, medIdx) => { const k = `${slotId}_${medIdx}`; checks[k] = !checks[k]; return !!checks[k]; },
+    saveVital:        (slotId, field, value) => { if (!vitals[slotId]) vitals[slotId] = {}; vitals[slotId][field] = value; },
+    getVital:         (slotId, field) => vitals[slotId]?.[field] || '',
+    hydrateFromCloud: () => Promise.resolve(),
+  };
+})();
+
 global.localStorage = (() => {
   let store = {};
   return {

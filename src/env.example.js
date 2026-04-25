@@ -3,8 +3,8 @@
  * env.js está en .gitignore — nunca commitear keys reales
  */
 window.SUPABASE_CONFIG = {
-  url: 'https://[TU-PROJECT].supabase.co',
-  anonKey: '[TU-ANON-KEY]'
+  url: 'https://vvqpknduifkkfywpiwkn.supabase.co',
+  anonKey: '[TU-ANON-KEY]'  // Dashboard → Project Settings → API → anon public
 };
 
 // Opcional — para TTS de alta calidad

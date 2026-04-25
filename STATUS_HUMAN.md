@@ -38,50 +38,46 @@ son obligatorias**. La 4 y 5 son mejoras opcionales.
 
 ### 1. Configurar Supabase 🔴 OBLIGATORIA
 
-**Por qué**: Sin esto, lo que Nelson registre en su iPhone NO aparece en el
+**Por qué**: Sin esto, lo que Nelson registre en su Android NO aparece en el
 dispositivo del cuidador. La app funciona pero como dos copias aisladas.
 
-**Pasos**:
+**✅ Proyecto ya creado**: `https://vvqpknduifkkfywpiwkn.supabase.co`
 
-1. Ir a https://supabase.com → crear proyecto nuevo (free tier alcanza).
-   - Region recomendada: `South America (São Paulo)` para baja latencia desde Cuenca.
-   - Anota el password del DB en un gestor seguro.
+**Pasos pendientes**:
 
-2. En el dashboard del proyecto: **SQL Editor → New query** → pegar el contenido
-   de [supabase/schema.sql](supabase/schema.sql) → **Run**. Debe completarse sin
-   errores y crear 3 tablas + 2 vistas.
+1. **Correr el schema** (si aún no se hizo): En el dashboard del proyecto:
+   **SQL Editor → New query** → pegar el contenido de [supabase/schema.sql](supabase/schema.sql)
+   → **Run**. Debe crear 3 tablas (`medication_logs`, `vital_logs`, `pill_photos`)
+   y 2 vistas sin errores.
 
-3. **Storage → New bucket**:
+2. **Storage → New bucket** (si aún no existe):
    - Name: `pill-photos`
    - Public bucket: ✅ **sí**
    - Allowed MIME types: `image/jpeg, image/png, image/webp`
 
-4. **Settings → API** → copiar:
-   - `Project URL` → ej: `https://xxxxx.supabase.co`
-   - `anon public` key (la larga que empieza con `eyJ...`)
+3. **Settings → API** → copiar la `anon public` key (la larga que empieza con `eyJ...`).
+   La URL ya está pre-configurada en [src/env.example.js](src/env.example.js).
 
-5. **Configurar local** (para desarrollo):
+4. **Configurar local** (para desarrollo):
    ```bash
    cp src/env.example.js src/env.js
-   # Editar src/env.js con la URL y la anon key reales
+   # Editar src/env.js — solo falta el anonKey (la URL ya está)
    ```
    `src/env.js` está en `.gitignore` — nunca se commitea.
 
-6. **Configurar producción** (GitHub Pages): hay dos opciones:
+5. **Configurar producción** (GitHub Pages): la anon key de Supabase está
+   diseñada para ser pública (RLS la protege). Opciones:
 
-   **Opción A (rápido, menos seguro)**: editar `src/env.example.js` directamente
-   en el branch `main` con la URL y anon key. La anon key de Supabase está
-   diseñada para ser pública (RLS la protege), así que es aceptable. Renombrar
-   `env.example.js` → `env.js` y quitar `env.js` del `.gitignore`.
+   **Opción A (más rápido)**: renombrar `src/env.example.js` → `src/env.js`,
+   completar el `anonKey`, quitar `env.js` del `.gitignore`, commitear y pushear.
 
-   **Opción B (recomendado)**: GitHub Actions secret + script de inyección en
-   build. Modificar [deploy.yml](deploy.yml) para que un step genere `src/env.js`
-   con `${{ secrets.SUPABASE_URL }}` y `${{ secrets.SUPABASE_ANON_KEY }}` antes
-   del upload. Es más limpio pero requiere editar el workflow.
+   **Opción B (más limpio)**: crear GitHub Actions workflow con secrets
+   `SUPABASE_ANON_KEY` y generar `env.js` en el build step. No hay workflow
+   todavía — requiere crear `.github/workflows/deploy.yml`.
 
-7. **Verificar**: abrir DevTools en local → Console → debe aparecer:
+6. **Verificar**: abrir DevTools en local → Console → debe aparecer:
    ```
-   [Supabase] Conectado a https://xxxxx.supabase.co
+   [Supabase] Conectado a https://vvqpknduifkkfywpiwkn.supabase.co
    ```
    Y al marcar una pastilla, debe aparecer una fila nueva en
    `medication_logs` desde el SQL Editor.
@@ -109,8 +105,8 @@ y `assets/icon-512.png` que **no existen**. iOS/Android usarán un icono genéri
 
 3. Commit y push.
 
-4. Verificar: en iPhone Safari → "Añadir a pantalla de inicio" → debe mostrar
-   el icono diseñado, no la letra "N" genérica.
+4. Verificar: en Chrome Android → menú ⋮ → "Instalar app" → debe mostrar
+   el icono diseñado, no el icono genérico.
 
 ---
 

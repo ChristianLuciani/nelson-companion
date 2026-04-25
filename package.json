@@ -21,6 +21,7 @@
   },
   "jest": {
     "testEnvironment": "jsdom",
-    "testMatch": ["**/tests/unit/**/*.test.js"]
+    "testMatch": ["**/tests/unit/**/*.test.js"],
+    "testPathIgnorePatterns": ["/node_modules/", "/.claude/"]
   }
 }
