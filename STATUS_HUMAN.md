@@ -84,29 +84,17 @@ dispositivo del cuidador. La app funciona pero como dos copias aisladas.
 
 ---
 
-### 2. Crear iconos PWA 🔴 OBLIGATORIA para instalación
+### 2. Iconos PWA ✅ COMPLETADA
 
-**Por qué**: [src/manifest.json](src/manifest.json) referencia `assets/icon-192.png`
-y `assets/icon-512.png` que **no existen**. iOS/Android usarán un icono genérico
-(captura de pantalla o letra) si faltan, lo cual queda feo y poco profesional.
+Favicon e iconos generados con RealFaviconGenerator e integrados en commit `chore: favicon`.
 
-**Pasos**:
+Archivos en `src/`:
+- `favicon.svg`, `favicon-96x96.png`, `favicon.ico` — favicon para navegadores
+- `apple-touch-icon.png` — icono para "Añadir a pantalla de inicio" en Android/iOS
+- `assets/web-app-manifest-192x192.png` + `assets/web-app-manifest-512x512.png` — iconos PWA
 
-1. Conseguir o diseñar un icono cuadrado, fondo sólido (no transparente), simple.
-   Sugerencia: corazón estilizado 🫀 sobre fondo `#1B4F72`, o las iniciales "NL".
-   Herramientas:
-   - https://realfavicongenerator.net/ (genera todas las tallas desde un PNG)
-   - https://www.figma.com (diseñar a mano)
-   - Cualquier app de imagen + plantilla 512x512
-
-2. Guardar como:
-   - `src/assets/icon-192.png` (192×192 px, PNG)
-   - `src/assets/icon-512.png` (512×512 px, PNG)
-
-3. Commit y push.
-
-4. Verificar: en Chrome Android → menú ⋮ → "Instalar app" → debe mostrar
-   el icono diseñado, no el icono genérico.
+**Verificar**: en Chrome Android → menú ⋮ → "Instalar app" → debe mostrar
+el icono de la app, no el icono genérico.
 
 ---
 
