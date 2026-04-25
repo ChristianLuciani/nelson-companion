@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=no"/>
+  <meta name="apple-mobile-web-app-capable" content="yes"/>
+  <meta name="apple-mobile-web-app-status-bar-style" content="default"/>
+  <meta name="theme-color" content="#1B4F72"/>
+  <link rel="manifest" href="manifest.json"/>
+  <title>Nelson</title>
+  <link rel="stylesheet" href="css/patient.css"/>
+</head>
+<body data-user-type="patient">
+  <div id="app">
+    <div style="padding:2rem;text-align:center;color:#888;font-family:sans-serif">
+      Cargando...
+    </div>
+  </div>
+
+  <!-- Supabase (opcional — si no está configurado, opera offline) -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+
+  <!-- Configuración (env.js está en .gitignore — opcional) -->
+  <script src="env.js" onerror="console.info('env.js no encontrado — modo offline')"></script>
+
+  <!-- Módulos COMPARTIDOS con caregiver.html (mismo backend) -->
+  <script src="js/tts.js"></script>
+  <script src="js/supabase.js"></script>
+  <script src="js/db.js"></script>
+  <script src="js/protocol.js"></script>
+
+  <!-- Controlador específico del paciente -->
+  <script src="js/patient.js"></script>
+</body>
+</html>

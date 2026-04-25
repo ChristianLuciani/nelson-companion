@@ -1,0 +1,181 @@
+/* ============================================================
+   Patient interface — Nelson
+   Diseñado para afasia de Broca:
+   - Una sola tarea visible a la vez
+   - Botones gigantes (mín 80px altura)
+   - Tipografía grande (24-32px)
+   - Pictogramas + color + voz
+   ============================================================ */
+
+* { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+html, body {
+  margin: 0; padding: 0; min-height: 100%;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  background: #F4F6F8; color: #1B2A3A;
+  -webkit-text-size-adjust: 100%;
+}
+
+body { padding-bottom: 80px; }
+
+/* ── HEADER ─────────────────────────────────────────────────── */
+.p-header {
+  padding: 1.25rem 1.25rem 1rem;
+  background: #FFFFFF;
+  border-bottom: 1px solid #E5E7EB;
+  display: flex; justify-content: space-between; align-items: center;
+}
+.p-greeting {
+  font-size: 22px; font-weight: 500; margin: 0;
+  letter-spacing: -0.3px;
+}
+.p-time {
+  font-size: 32px; font-weight: 300; line-height: 1;
+  color: #1B4F72; letter-spacing: -1px;
+  font-variant-numeric: tabular-nums;
+}
+
+/* ── CURRENT TASK CARD ──────────────────────────────────────── */
+.p-card {
+  margin: 1.25rem;
+  background: #FFFFFF;
+  border-radius: 20px;
+  padding: 1.5rem 1.25rem;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+  border: 1px solid #E5E7EB;
+}
+.p-card.current {
+  border: 3px solid #1B4F72;
+  box-shadow: 0 4px 16px rgba(27,79,114,0.15);
+}
+.p-card.done {
+  background: #E8F8F0;
+  border-color: #1E8449;
+}
+.p-card.idle {
+  background: #F9FAFB;
+  text-align: center;
+  color: #6B7280;
+}
+
+.p-card-time {
+  font-size: 18px; font-weight: 500; color: #6B7280;
+  margin: 0 0 0.5rem;
+  font-variant-numeric: tabular-nums;
+}
+.p-card-title {
+  font-size: 28px; font-weight: 500; margin: 0 0 1rem;
+  letter-spacing: -0.4px; line-height: 1.15;
+}
+
+/* ── PILL DISPLAY ───────────────────────────────────────────── */
+.p-pill {
+  display: flex; align-items: center; gap: 1rem;
+  background: #F9FAFB; border-radius: 14px;
+  padding: 1rem; margin-bottom: 1rem;
+}
+.p-pill-photo {
+  width: 80px; height: 80px; border-radius: 14px;
+  object-fit: cover; background: #E5E7EB;
+  flex-shrink: 0;
+}
+.p-pill-placeholder {
+  width: 80px; height: 80px; border-radius: 14px;
+  background: #E5E7EB; display: flex; align-items: center; justify-content: center;
+  font-size: 44px; flex-shrink: 0;
+}
+.p-pill-info { flex: 1; min-width: 0; }
+.p-pill-name { font-size: 22px; font-weight: 500; margin: 0; }
+.p-pill-dose { font-size: 16px; color: #6B7280; margin: 4px 0 0; }
+
+/* ── ACTION BUTTONS ─────────────────────────────────────────── */
+.p-action-btn {
+  display: flex; align-items: center; justify-content: center;
+  width: 100%; min-height: 80px;
+  background: #1E8449; color: #FFFFFF;
+  border: none; border-radius: 14px;
+  font-size: 24px; font-weight: 500;
+  font-family: inherit; cursor: pointer;
+  gap: 0.75rem;
+  transition: transform 0.1s ease, background 0.1s ease;
+}
+.p-action-btn:active { transform: scale(0.97); background: #176837; }
+.p-action-btn.done { background: #6B7280; }
+.p-action-btn.secondary {
+  background: #FFFFFF; color: #1B4F72; border: 2px solid #1B4F72;
+  font-size: 18px; min-height: 60px;
+}
+.p-action-btn.secondary:active { background: #EBF5FB; }
+
+/* ── VOICE BUTTON ───────────────────────────────────────────── */
+.p-voice-btn {
+  display: flex; align-items: center; justify-content: center;
+  width: 64px; height: 64px;
+  background: #1B4F72; color: #FFFFFF;
+  border: none; border-radius: 50%;
+  font-size: 28px;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: transform 0.1s ease;
+}
+.p-voice-btn:active { transform: scale(0.92); }
+.p-voice-btn.speaking {
+  background: #C0392B;
+  animation: pulse 1.2s ease-in-out infinite;
+}
+@keyframes pulse {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(192,57,43,0.5); }
+  50%      { box-shadow: 0 0 0 12px rgba(192,57,43,0); }
+}
+
+/* ── VITAL INPUTS ───────────────────────────────────────────── */
+.p-vital-grid {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem;
+  margin-bottom: 1rem;
+}
+.p-vital-field {
+  background: #F9FAFB; border-radius: 12px; padding: 0.75rem;
+  text-align: center;
+}
+.p-vital-label {
+  font-size: 14px; color: #6B7280; margin: 0 0 4px;
+  font-weight: 500; text-transform: uppercase; letter-spacing: 0.5px;
+}
+.p-vital-input {
+  width: 100%; border: none; background: transparent;
+  text-align: center; font-size: 36px; font-weight: 400;
+  font-variant-numeric: tabular-nums;
+  color: #1B4F72; padding: 4px 0;
+  font-family: inherit;
+}
+.p-vital-input:focus { outline: none; color: #C0392B; }
+.p-vital-unit { font-size: 12px; color: #9CA3AF; }
+
+/* ── NEXT HINT ──────────────────────────────────────────────── */
+.p-next {
+  text-align: center; padding: 1rem 1.25rem;
+  font-size: 15px; color: #6B7280;
+}
+.p-next strong { color: #1B4F72; font-weight: 500; }
+
+/* ── VOICE BANNER (primer arranque) ─────────────────────────── */
+.p-voice-banner {
+  margin: 1.25rem; padding: 1.25rem;
+  background: #FFF7E6; border: 2px solid #F39C12;
+  border-radius: 14px; text-align: center;
+}
+.p-voice-banner p {
+  margin: 0 0 0.75rem; font-size: 17px; color: #7A4A00;
+}
+
+/* ── SWITCH MODE LINK ───────────────────────────────────────── */
+.p-switch-mode {
+  position: fixed; bottom: 12px; left: 50%; transform: translateX(-50%);
+  font-size: 12px; color: #9CA3AF;
+  background: rgba(255,255,255,.85);
+  padding: 6px 12px; border-radius: 8px;
+  text-decoration: none; border: 1px solid #E5E7EB;
+}
+
+/* ── BIG MODE — para slot vital sin distracción ─────────────── */
+.p-big-icon { font-size: 64px; line-height: 1; margin-bottom: 0.5rem; }
