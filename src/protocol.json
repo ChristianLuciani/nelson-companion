@@ -1,18 +1,245 @@
 {
   "patient": { "name": "Nelson" },
   "medications": {
-    "amlodipino": { "name": "Amlodipino", "dose": "2.5mg", "description": "Pastilla naranja" },
-    "nebivolol": { "name": "Nebivolol", "dose": "1.25mg", "description": "Pastilla azul" },
-    "simvastatina": { "name": "Simvastatina", "dose": "20mg", "description": "Pastilla roja" }
+    "amlodipino":   { "name": "Amlodipino",   "dose": "2.5mg",  "description": "Pastilla naranja" },
+    "nebivolol":    { "name": "Nebivolol",     "dose": "1.25mg", "description": "Pastilla azul" },
+    "simvastatina": { "name": "Simvastatina",  "dose": "20mg",   "description": "Pastilla roja" }
   },
   "days": {
     "2026-04-24": {
       "label": "Jue 24 Abr", "risk": "yellow",
       "slots": [
-        { "id": "20260424_0800", "time": "08:00", "type": "med", "meds": [{"id": "amlodipino", "name": "Amlodipino", "dose": "2.5mg"}], "speech": "Buenos días Nelson. Toma la pastilla naranja." },
-        { "id": "20260424_0830", "time": "08:30", "type": "vital", "speech": "Mide tu presión y oxígeno." },
-        { "id": "20260424_1200", "time": "12:00", "type": "med", "meds": [{"id": "nebivolol", "name": "Nebivolol", "dose": "1.25mg"}], "speech": "Es la hora del nebivolol." },
-        { "id": "20260424_1900", "time": "19:00", "type": "med", "meds": [{"id": "simvastatina", "name": "Simvastatina", "dose": "20mg"}], "speech": "Toma la pastilla roja antes de dormir." }
+        { "id": "20260424_0800", "time": "08:00", "type": "med",   "meds": [{"id": "amlodipino",   "name": "Amlodipino",   "dose": "2.5mg"}],  "speech": "Buenos días Nelson. Tomá la pastilla naranja." },
+        { "id": "20260424_0830", "time": "08:30", "type": "vital",  "speech": "Medí tu presión y oxígeno." },
+        { "id": "20260424_1200", "time": "12:00", "type": "med",   "meds": [{"id": "nebivolol",    "name": "Nebivolol",    "dose": "1.25mg"}], "speech": "Es la hora del nebivolol." },
+        { "id": "20260424_1900", "time": "19:00", "type": "med",   "meds": [{"id": "simvastatina", "name": "Simvastatina", "dose": "20mg"}],   "speech": "Tomá la pastilla roja antes de dormir." }
+      ]
+    },
+    "2026-04-25": {
+      "label": "Vie 25 Abr", "risk": "normal",
+      "slots": [
+        {
+          "id": "20260425_0730", "time": "07:30", "type": "photo",
+          "icon": "sun", "label": "Buen día, Nelson", "desc": "Mirá la foto del día",
+          "speech": "Buen día Nelson. Hoy es viernes. Hace sol afuera."
+        },
+        {
+          "id": "20260425_0800", "time": "08:00", "type": "med",
+          "icon": "pill", "label": "Amlodipino (mañana)", "desc": "Pastilla naranja · con agua",
+          "meds": [{"id": "amlodipino", "name": "Amlodipino", "dose": "2.5mg"}],
+          "speech": "Es hora de tomar tu medicación. Amlodipino."
+        },
+        {
+          "id": "20260425_0830", "time": "08:30", "type": "vital",
+          "icon": "heart", "label": "Medir presión y oxígeno", "desc": "Brazo izquierdo, sentado, en reposo",
+          "speech": "Vamos a tomar la presión. Ponete el tensiómetro en el brazo izquierdo."
+        },
+        {
+          "id": "20260425_0900", "time": "09:00", "type": "meal",
+          "icon": "cup", "label": "Desayuno", "desc": "Té, tostadas, fruta",
+          "speech": "Hora del desayuno. Té, tostadas y fruta."
+        },
+        {
+          "id": "20260425_1000", "time": "10:00", "type": "walk",
+          "icon": "walk", "label": "Caminar 15 minutos", "desc": "Por el patio o la cuadra",
+          "duration": 15,
+          "speech": "Hora de caminar quince minutos. Por el patio o la cuadra."
+        },
+        {
+          "id": "20260425_1230", "time": "12:30", "type": "meal",
+          "icon": "plate", "label": "Almuerzo", "desc": "Comida liviana, sin sal extra",
+          "speech": "Hora del almuerzo. Comida liviana, sin sal extra."
+        },
+        {
+          "id": "20260425_1200", "time": "12:00", "type": "med",
+          "icon": "pill", "label": "Nebivolol (mediodía)", "desc": "Pastilla azul · con el almuerzo",
+          "meds": [{"id": "nebivolol", "name": "Nebivolol", "dose": "1.25mg"}],
+          "speech": "Es la hora del nebivolol. Pastilla azul con el almuerzo."
+        },
+        {
+          "id": "20260425_1400", "time": "14:00", "type": "photo",
+          "icon": "moon", "label": "Siesta", "desc": "Descansá un rato",
+          "speech": "Es hora de descansar un rato. Recostate tranquilo."
+        },
+        {
+          "id": "20260425_1700", "time": "17:00", "type": "vital",
+          "icon": "heart", "label": "Medir presión (tarde)", "desc": "Brazo izquierdo, sentado, en reposo",
+          "speech": "Hora de medir la presión de la tarde. Sentado con el brazo izquierdo."
+        },
+        {
+          "id": "20260425_1730", "time": "17:30", "type": "meal",
+          "icon": "cup", "label": "Merienda", "desc": "Mate y galletitas",
+          "speech": "Hora de la merienda. Mate y galletitas."
+        },
+        {
+          "id": "20260425_1830", "time": "18:30", "type": "walk",
+          "icon": "walk", "label": "Caminar 10 minutos", "desc": "Movimiento suave",
+          "duration": 10,
+          "speech": "Hora de caminar diez minutos. Movimiento suave."
+        },
+        {
+          "id": "20260425_1900", "time": "19:00", "type": "med",
+          "icon": "pill", "label": "Simvastatina (noche)", "desc": "Pastilla roja · antes de dormir",
+          "meds": [{"id": "simvastatina", "name": "Simvastatina", "dose": "20mg"}],
+          "speech": "Es hora de tomar la Simvastatina. Pastilla roja antes de dormir."
+        },
+        {
+          "id": "20260425_2000", "time": "20:00", "type": "meal",
+          "icon": "plate", "label": "Cena", "desc": "Liviana, temprano",
+          "speech": "Hora de cenar. Liviana y temprano."
+        }
+      ]
+    },
+    "2026-04-26": {
+      "label": "Sáb 26 Abr", "risk": "normal",
+      "slots": [
+        {
+          "id": "20260426_0730", "time": "07:30", "type": "photo",
+          "icon": "sun", "label": "Buen día, Nelson", "desc": "Mirá la foto del día",
+          "speech": "Buen día Nelson. Hoy es sábado."
+        },
+        {
+          "id": "20260426_0800", "time": "08:00", "type": "med",
+          "icon": "pill", "label": "Amlodipino (mañana)", "desc": "Pastilla naranja · con agua",
+          "meds": [{"id": "amlodipino", "name": "Amlodipino", "dose": "2.5mg"}],
+          "speech": "Es hora de tomar tu medicación. Amlodipino."
+        },
+        {
+          "id": "20260426_0830", "time": "08:30", "type": "vital",
+          "icon": "heart", "label": "Medir presión y oxígeno", "desc": "Brazo izquierdo, sentado, en reposo",
+          "speech": "Vamos a tomar la presión. Ponete el tensiómetro en el brazo izquierdo."
+        },
+        {
+          "id": "20260426_0900", "time": "09:00", "type": "meal",
+          "icon": "cup", "label": "Desayuno", "desc": "Té, tostadas, fruta",
+          "speech": "Hora del desayuno."
+        },
+        {
+          "id": "20260426_1000", "time": "10:00", "type": "walk",
+          "icon": "walk", "label": "Caminar 15 minutos", "desc": "Por el patio o la cuadra",
+          "duration": 15,
+          "speech": "Hora de caminar quince minutos."
+        },
+        {
+          "id": "20260426_1200", "time": "12:00", "type": "med",
+          "icon": "pill", "label": "Nebivolol (mediodía)", "desc": "Pastilla azul · con el almuerzo",
+          "meds": [{"id": "nebivolol", "name": "Nebivolol", "dose": "1.25mg"}],
+          "speech": "Es la hora del nebivolol."
+        },
+        {
+          "id": "20260426_1230", "time": "12:30", "type": "meal",
+          "icon": "plate", "label": "Almuerzo", "desc": "Comida liviana, sin sal extra",
+          "speech": "Hora del almuerzo."
+        },
+        {
+          "id": "20260426_1700", "time": "17:00", "type": "vital",
+          "icon": "heart", "label": "Medir presión (tarde)", "desc": "Brazo izquierdo, sentado, en reposo",
+          "speech": "Hora de medir la presión de la tarde."
+        },
+        {
+          "id": "20260426_1830", "time": "18:30", "type": "walk",
+          "icon": "walk", "label": "Caminar 10 minutos", "desc": "Movimiento suave",
+          "duration": 10,
+          "speech": "Hora de caminar diez minutos."
+        },
+        {
+          "id": "20260426_1900", "time": "19:00", "type": "med",
+          "icon": "pill", "label": "Simvastatina (noche)", "desc": "Pastilla roja · antes de dormir",
+          "meds": [{"id": "simvastatina", "name": "Simvastatina", "dose": "20mg"}],
+          "speech": "Es hora de tomar la Simvastatina."
+        },
+        {
+          "id": "20260426_2000", "time": "20:00", "type": "meal",
+          "icon": "plate", "label": "Cena", "desc": "Liviana, temprano",
+          "speech": "Hora de cenar."
+        }
+      ]
+    },
+    "2026-04-27": {
+      "label": "Dom 27 Abr", "risk": "normal",
+      "slots": [
+        { "id": "20260427_0730", "time": "07:30", "type": "photo", "icon": "sun", "label": "Buen día, Nelson", "desc": "Mirá la foto del día", "speech": "Buen día Nelson. Hoy es domingo." },
+        { "id": "20260427_0800", "time": "08:00", "type": "med", "icon": "pill", "label": "Amlodipino", "desc": "Pastilla naranja · con agua", "meds": [{"id": "amlodipino", "name": "Amlodipino", "dose": "2.5mg"}], "speech": "Es hora del Amlodipino." },
+        { "id": "20260427_0830", "time": "08:30", "type": "vital", "icon": "heart", "label": "Medir presión", "desc": "Brazo izquierdo, sentado", "speech": "Hora de medir la presión." },
+        { "id": "20260427_1200", "time": "12:00", "type": "med", "icon": "pill", "label": "Nebivolol", "desc": "Pastilla azul · con el almuerzo", "meds": [{"id": "nebivolol", "name": "Nebivolol", "dose": "1.25mg"}], "speech": "Es la hora del nebivolol." },
+        { "id": "20260427_1700", "time": "17:00", "type": "vital", "icon": "heart", "label": "Medir presión (tarde)", "desc": "Brazo izquierdo, sentado", "speech": "Hora de medir la presión de la tarde." },
+        { "id": "20260427_1900", "time": "19:00", "type": "med", "icon": "pill", "label": "Simvastatina", "desc": "Pastilla roja · antes de dormir", "meds": [{"id": "simvastatina", "name": "Simvastatina", "dose": "20mg"}], "speech": "Es hora de tomar la Simvastatina." }
+      ]
+    },
+    "2026-04-28": {
+      "label": "Lun 28 Abr", "risk": "normal",
+      "slots": [
+        { "id": "20260428_0730", "time": "07:30", "type": "photo", "icon": "sun", "label": "Buen día, Nelson", "desc": "Mirá la foto del día", "speech": "Buen día Nelson. Hoy es lunes." },
+        { "id": "20260428_0800", "time": "08:00", "type": "med", "icon": "pill", "label": "Amlodipino", "desc": "Pastilla naranja · con agua", "meds": [{"id": "amlodipino", "name": "Amlodipino", "dose": "2.5mg"}], "speech": "Es hora del Amlodipino." },
+        { "id": "20260428_0830", "time": "08:30", "type": "vital", "icon": "heart", "label": "Medir presión", "desc": "Brazo izquierdo, sentado", "speech": "Hora de medir la presión." },
+        { "id": "20260428_1000", "time": "10:00", "type": "walk", "icon": "walk", "label": "Caminar 15 minutos", "desc": "Por el patio o la cuadra", "duration": 15, "speech": "Hora de caminar quince minutos." },
+        { "id": "20260428_1200", "time": "12:00", "type": "med", "icon": "pill", "label": "Nebivolol", "desc": "Pastilla azul · con el almuerzo", "meds": [{"id": "nebivolol", "name": "Nebivolol", "dose": "1.25mg"}], "speech": "Es la hora del nebivolol." },
+        { "id": "20260428_1700", "time": "17:00", "type": "vital", "icon": "heart", "label": "Medir presión (tarde)", "desc": "Brazo izquierdo, sentado", "speech": "Hora de medir la presión de la tarde." },
+        { "id": "20260428_1830", "time": "18:30", "type": "walk", "icon": "walk", "label": "Caminar 10 minutos", "desc": "Movimiento suave", "duration": 10, "speech": "Hora de caminar diez minutos." },
+        { "id": "20260428_1900", "time": "19:00", "type": "med", "icon": "pill", "label": "Simvastatina", "desc": "Pastilla roja · antes de dormir", "meds": [{"id": "simvastatina", "name": "Simvastatina", "dose": "20mg"}], "speech": "Es hora de tomar la Simvastatina." }
+      ]
+    },
+    "2026-04-29": {
+      "label": "Mar 29 Abr", "risk": "normal",
+      "slots": [
+        { "id": "20260429_0730", "time": "07:30", "type": "photo", "icon": "sun", "label": "Buen día, Nelson", "desc": "Mirá la foto del día", "speech": "Buen día Nelson. Hoy es martes." },
+        { "id": "20260429_0800", "time": "08:00", "type": "med", "icon": "pill", "label": "Amlodipino", "desc": "Pastilla naranja · con agua", "meds": [{"id": "amlodipino", "name": "Amlodipino", "dose": "2.5mg"}], "speech": "Es hora del Amlodipino." },
+        { "id": "20260429_0830", "time": "08:30", "type": "vital", "icon": "heart", "label": "Medir presión", "desc": "Brazo izquierdo, sentado", "speech": "Hora de medir la presión." },
+        { "id": "20260429_1000", "time": "10:00", "type": "walk", "icon": "walk", "label": "Caminar 15 minutos", "desc": "Por el patio o la cuadra", "duration": 15, "speech": "Hora de caminar quince minutos." },
+        { "id": "20260429_1200", "time": "12:00", "type": "med", "icon": "pill", "label": "Nebivolol", "desc": "Pastilla azul · con el almuerzo", "meds": [{"id": "nebivolol", "name": "Nebivolol", "dose": "1.25mg"}], "speech": "Es la hora del nebivolol." },
+        { "id": "20260429_1700", "time": "17:00", "type": "vital", "icon": "heart", "label": "Medir presión (tarde)", "desc": "Brazo izquierdo, sentado", "speech": "Hora de medir la presión de la tarde." },
+        { "id": "20260429_1830", "time": "18:30", "type": "walk", "icon": "walk", "label": "Caminar 10 minutos", "desc": "Movimiento suave", "duration": 10, "speech": "Hora de caminar diez minutos." },
+        { "id": "20260429_1900", "time": "19:00", "type": "med", "icon": "pill", "label": "Simvastatina", "desc": "Pastilla roja · antes de dormir", "meds": [{"id": "simvastatina", "name": "Simvastatina", "dose": "20mg"}], "speech": "Es hora de tomar la Simvastatina." }
+      ]
+    },
+    "2026-04-30": {
+      "label": "Mié 30 Abr", "risk": "normal",
+      "slots": [
+        { "id": "20260430_0730", "time": "07:30", "type": "photo", "icon": "sun", "label": "Buen día, Nelson", "desc": "Mirá la foto del día", "speech": "Buen día Nelson. Hoy es miércoles." },
+        { "id": "20260430_0800", "time": "08:00", "type": "med", "icon": "pill", "label": "Amlodipino", "desc": "Pastilla naranja · con agua", "meds": [{"id": "amlodipino", "name": "Amlodipino", "dose": "2.5mg"}], "speech": "Es hora del Amlodipino." },
+        { "id": "20260430_0830", "time": "08:30", "type": "vital", "icon": "heart", "label": "Medir presión", "desc": "Brazo izquierdo, sentado", "speech": "Hora de medir la presión." },
+        { "id": "20260430_1000", "time": "10:00", "type": "walk", "icon": "walk", "label": "Caminar 15 minutos", "desc": "Por el patio o la cuadra", "duration": 15, "speech": "Hora de caminar quince minutos." },
+        { "id": "20260430_1200", "time": "12:00", "type": "med", "icon": "pill", "label": "Nebivolol", "desc": "Pastilla azul · con el almuerzo", "meds": [{"id": "nebivolol", "name": "Nebivolol", "dose": "1.25mg"}], "speech": "Es la hora del nebivolol." },
+        { "id": "20260430_1700", "time": "17:00", "type": "vital", "icon": "heart", "label": "Medir presión (tarde)", "desc": "Brazo izquierdo, sentado", "speech": "Hora de medir la presión de la tarde." },
+        { "id": "20260430_1830", "time": "18:30", "type": "walk", "icon": "walk", "label": "Caminar 10 minutos", "desc": "Movimiento suave", "duration": 10, "speech": "Hora de caminar diez minutos." },
+        { "id": "20260430_1900", "time": "19:00", "type": "med", "icon": "pill", "label": "Simvastatina", "desc": "Pastilla roja · antes de dormir", "meds": [{"id": "simvastatina", "name": "Simvastatina", "dose": "20mg"}], "speech": "Es hora de tomar la Simvastatina." }
+      ]
+    },
+    "2026-05-01": {
+      "label": "Jue 1 Mayo", "risk": "yellow",
+      "note": "Día de viaje Panamá → Cuenca Ecuador (2500m altitud). Monitoreo extra.",
+      "slots": [
+        { "id": "20260501_0730", "time": "07:30", "type": "photo", "icon": "sun", "label": "Buen día, Nelson", "desc": "Hoy viajamos a Ecuador", "speech": "Buen día Nelson. Hoy es el día del viaje a Ecuador." },
+        { "id": "20260501_0800", "time": "08:00", "type": "med", "icon": "pill", "label": "Amlodipino", "desc": "Pastilla naranja · con agua", "meds": [{"id": "amlodipino", "name": "Amlodipino", "dose": "2.5mg"}], "speech": "Es hora del Amlodipino." },
+        { "id": "20260501_0830", "time": "08:30", "type": "vital", "icon": "heart", "label": "Medir presión", "desc": "Antes de salir al aeropuerto", "speech": "Hora de medir la presión antes de salir." },
+        { "id": "20260501_1200", "time": "12:00", "type": "med", "icon": "pill", "label": "Nebivolol", "desc": "Pastilla azul", "meds": [{"id": "nebivolol", "name": "Nebivolol", "dose": "1.25mg"}], "speech": "Es la hora del nebivolol." },
+        { "id": "20260501_1700", "time": "17:00", "type": "vital", "icon": "heart", "label": "Medir presión (llegada)", "desc": "Al llegar a Cuenca — altitud 2500m", "speech": "Hora de medir la presión al llegar a Cuenca." },
+        { "id": "20260501_1900", "time": "19:00", "type": "med", "icon": "pill", "label": "Simvastatina", "desc": "Pastilla roja · antes de dormir", "meds": [{"id": "simvastatina", "name": "Simvastatina", "dose": "20mg"}], "speech": "Es hora de tomar la Simvastatina." }
+      ]
+    },
+    "2026-05-02": {
+      "label": "Vie 2 Mayo", "risk": "yellow",
+      "note": "Primer día en Cuenca (2500m). Monitorear SpO2 y PA con más frecuencia.",
+      "slots": [
+        { "id": "20260502_0730", "time": "07:30", "type": "photo", "icon": "sun", "label": "Buen día, Nelson", "desc": "Primer día en Cuenca", "speech": "Buen día Nelson. Primer día en Cuenca, Ecuador." },
+        { "id": "20260502_0800", "time": "08:00", "type": "med", "icon": "pill", "label": "Amlodipino", "desc": "Pastilla naranja · con agua", "meds": [{"id": "amlodipino", "name": "Amlodipino", "dose": "2.5mg"}], "speech": "Es hora del Amlodipino." },
+        { "id": "20260502_0830", "time": "08:30", "type": "vital", "icon": "heart", "label": "Medir presión y SpO2", "desc": "Control de altitud — brazo izquierdo, sentado", "speech": "Hora de medir la presión y el oxígeno. Control de altitud." },
+        { "id": "20260502_1200", "time": "12:00", "type": "med", "icon": "pill", "label": "Nebivolol", "desc": "Pastilla azul", "meds": [{"id": "nebivolol", "name": "Nebivolol", "dose": "1.25mg"}], "speech": "Es la hora del nebivolol." },
+        { "id": "20260502_1400", "time": "14:00", "type": "vital", "icon": "heart", "label": "Medir presión (tarde temprana)", "desc": "Control extra por altitud", "speech": "Hora de medir la presión. Control extra por la altitud." },
+        { "id": "20260502_1700", "time": "17:00", "type": "vital", "icon": "heart", "label": "Medir presión (tarde)", "desc": "Brazo izquierdo, sentado", "speech": "Hora de medir la presión de la tarde." },
+        { "id": "20260502_1900", "time": "19:00", "type": "med", "icon": "pill", "label": "Simvastatina", "desc": "Pastilla roja · antes de dormir", "meds": [{"id": "simvastatina", "name": "Simvastatina", "dose": "20mg"}], "speech": "Es hora de tomar la Simvastatina." }
+      ]
+    },
+    "2026-05-03": {
+      "label": "Sáb 3 Mayo", "risk": "normal",
+      "note": "Segundo día en Cuenca. Último día del protocolo actual antes del nuevo cardiólogo.",
+      "slots": [
+        { "id": "20260503_0730", "time": "07:30", "type": "photo", "icon": "sun", "label": "Buen día, Nelson", "desc": "Mirá la foto del día", "speech": "Buen día Nelson. Hoy es sábado." },
+        { "id": "20260503_0800", "time": "08:00", "type": "med", "icon": "pill", "label": "Amlodipino", "desc": "Pastilla naranja · con agua", "meds": [{"id": "amlodipino", "name": "Amlodipino", "dose": "2.5mg"}], "speech": "Es hora del Amlodipino." },
+        { "id": "20260503_0830", "time": "08:30", "type": "vital", "icon": "heart", "label": "Medir presión y SpO2", "desc": "Brazo izquierdo, sentado", "speech": "Hora de medir la presión y el oxígeno." },
+        { "id": "20260503_1200", "time": "12:00", "type": "med", "icon": "pill", "label": "Nebivolol", "desc": "Pastilla azul", "meds": [{"id": "nebivolol", "name": "Nebivolol", "dose": "1.25mg"}], "speech": "Es la hora del nebivolol." },
+        { "id": "20260503_1700", "time": "17:00", "type": "vital", "icon": "heart", "label": "Medir presión (tarde)", "desc": "Brazo izquierdo, sentado", "speech": "Hora de medir la presión de la tarde." },
+        { "id": "20260503_1900", "time": "19:00", "type": "med", "icon": "pill", "label": "Simvastatina", "desc": "Pastilla roja · antes de dormir", "meds": [{"id": "simvastatina", "name": "Simvastatina", "dose": "20mg"}], "speech": "Es hora de tomar la Simvastatina. Último día del protocolo actual." }
       ]
     }
   }
