@@ -12,7 +12,62 @@ pacientes con afasia de Broca y secuelas de ACV.
 
 **URL de producción**: https://christianluciani.github.io/nelson-companion/
 
-Abre el link en cualquier navegador móvil o desktop. No requiere instalación.
+Al entrar verás un **selector de modo** con dos opciones:
+
+- **🧑 Soy Nelson** → interfaz minimalista con una sola tarea visible, botones gigantes y voz automática.
+- **👩‍⚕️ Soy cuidador** → vista completa con agenda, presión, alertas, fotos y exportación CSV.
+
+Ambas escriben en el **mismo backend (Supabase)**. Lo que Nelson marca aparece en la vista del cuidador y viceversa. Marca "Recordar mi elección" para saltar el selector la próxima vez.
+
+URLs directas (para bookmark):
+- `https://christianluciani.github.io/nelson-companion/patient.html` — Nelson
+- `https://christianluciani.github.io/nelson-companion/caregiver.html` — Cuidador
+
+---
+
+## 📲 Instalar en el iPhone de Nelson (PWA)
+
+**Importante**: para que las alarmas de voz suenen aunque la app esté en background, hay que instalarla como PWA en el home screen. Esto se hace **una sola vez**.
+
+### Paso a paso (iOS 16.4 o superior)
+
+1. **Abre Safari** en el iPhone (no Chrome — Apple solo permite PWA install desde Safari).
+2. Ve a `https://christianluciani.github.io/nelson-companion/`.
+3. Toca **🧑 Soy Nelson** y marca "Recordar mi elección".
+4. Toca el botón **Compartir** (cuadrado con flecha hacia arriba) en la barra inferior.
+5. Desplázate hacia abajo y toca **"Añadir a pantalla de inicio"**.
+6. Confirma el nombre **"Nelson"** y toca **Añadir** (arriba a la derecha).
+7. El icono aparece en la pantalla de inicio. Cierra Safari.
+8. **Abre la app desde el icono** (no desde Safari) — se ejecuta a pantalla completa.
+9. Al cargar, toca **🔊 Activar voz**. El sistema preguntará por:
+   - **Permiso de notificaciones** → toca **Permitir** (para alarmas con la app cerrada).
+   - **Permiso de audio** → automático al tocar el botón.
+10. Listo. La app saluda a Nelson y queda lista para las alarmas del día.
+
+### Sobre las alarmas
+
+Cuando llega la hora de un slot (pastilla, presión, comida) la app:
+
+1. **Suena un chime corto** (880Hz → 660Hz) para llamar la atención.
+2. **Vibra el teléfono** (Android — iOS no permite vibración desde web).
+3. **Habla el recordatorio**: "Es la hora del nebivolol", "Es hora de medir la presión", etc.
+4. **Muestra una notificación del sistema** (si el permiso está concedido) que persiste hasta que Nelson la toca.
+5. **Repite cada 3 minutos** durante 30 minutos hasta que Nelson marca la tarea.
+
+### Limitaciones que Christian debe conocer
+
+- **iOS antes de 16.4** → no soporta notificaciones PWA. La voz solo suena si la app está abierta en pantalla.
+- **App cerrada por completo** → en iOS, las alarmas programadas en JavaScript no se disparan. Solución: dejar la app instalada como PWA (no cerrarla manualmente desde el switcher) y permitir notificaciones — el sistema mantiene el service worker vivo el tiempo suficiente para los pings de notificación push del backend.
+- **Para garantía absoluta** (Nelson olvida abrir la app, viaje con conexión inestable): la app aún no envía push notifications desde el servidor. Ver [issue de Background Push](https://github.com/ChristianLuciani/nelson-companion/issues) en el repo.
+- **Backup recomendado**: configurar también alarmas nativas en el iPhone (Reloj → Alarma) para los horarios fijos del protocolo, como red de seguridad.
+
+### Verificar que las alarmas funcionan
+
+Después de instalar:
+1. Abre la app desde el icono de home screen.
+2. Toca **🔊 Activar voz**.
+3. En el slot card del día, toca el botón **🔊** (a la derecha de la hora) → debe sonar la voz.
+4. Bloquea el iPhone y espera al siguiente slot programado → debe llegar la notificación.
 
 ---
 
@@ -89,13 +144,20 @@ git push origin main
 ```
 nelson-companion/
 ├── src/                    ← App web (desplegada en GitHub Pages)
-│   ├── index.html          ← Entrada única
+│   ├── index.html          ← Selector de modo (paciente / cuidador)
+│   ├── patient.html        ← Interfaz de Nelson (minimalista, alarmas de voz)
+│   ├── caregiver.html      ← Interfaz del cuidador (vista completa)
 │   ├── protocol.json       ← Datos del protocolo (editable)
 │   ├── js/
 │   │   ├── tts.js          ← Síntesis de voz multicapa
-│   │   ├── protocol.js     ← Estado y acceso a datos
-│   │   └── app.js          ← UI y lógica principal
-│   ├── css/styles.css      ← Estilos mobile-first
+│   │   ├── supabase.js     ← Cliente Supabase singleton
+│   │   ├── db.js           ← Persistencia offline-first (compartida)
+│   │   ├── protocol.js     ← Estado y acceso a datos (compartido)
+│   │   ├── app.js          ← Controlador del cuidador
+│   │   └── patient.js      ← Controlador del paciente (alarmas + UI grande)
+│   ├── css/
+│   │   ├── styles.css      ← Estilos del cuidador
+│   │   └── patient.css     ← Estilos del paciente (botones gigantes)
 │   └── assets/
 │       ├── pills/          ← Fotos de pastillas (agregar aquí)
 │       └── audio/          ← Audio pregrabado (slotId.mp3)
