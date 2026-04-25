@@ -38,105 +38,94 @@ son obligatorias**. La 4 y 5 son mejoras opcionales.
 
 ### 1. Configurar Supabase 🔴 OBLIGATORIA
 
-**Por qué**: Sin esto, lo que Nelson registre en su iPhone NO aparece en el
+**Por qué**: Sin esto, lo que Nelson registre en su Android NO aparece en el
 dispositivo del cuidador. La app funciona pero como dos copias aisladas.
 
-**Pasos**:
+**✅ Proyecto ya creado**: `https://vvqpknduifkkfywpiwkn.supabase.co`
 
-1. Ir a https://supabase.com → crear proyecto nuevo (free tier alcanza).
-   - Region recomendada: `South America (São Paulo)` para baja latencia desde Cuenca.
-   - Anota el password del DB en un gestor seguro.
+**Pasos pendientes**:
 
-2. En el dashboard del proyecto: **SQL Editor → New query** → pegar el contenido
-   de [supabase/schema.sql](supabase/schema.sql) → **Run**. Debe completarse sin
-   errores y crear 3 tablas + 2 vistas.
+1. **Correr el schema** (si aún no se hizo): En el dashboard del proyecto:
+   **SQL Editor → New query** → pegar el contenido de [supabase/schema.sql](supabase/schema.sql)
+   → **Run**. Debe crear 3 tablas (`medication_logs`, `vital_logs`, `pill_photos`)
+   y 2 vistas sin errores.
 
-3. **Storage → New bucket**:
+2. **Storage → New bucket** (si aún no existe):
    - Name: `pill-photos`
    - Public bucket: ✅ **sí**
    - Allowed MIME types: `image/jpeg, image/png, image/webp`
 
-4. **Settings → API** → copiar:
-   - `Project URL` → ej: `https://xxxxx.supabase.co`
-   - `anon public` key (la larga que empieza con `eyJ...`)
+3. **Settings → API** → copiar la `anon public` key (la larga que empieza con `eyJ...`).
+   La URL ya está pre-configurada en [src/env.example.js](src/env.example.js).
 
-5. **Configurar local** (para desarrollo):
+4. **Configurar local** (para desarrollo):
    ```bash
    cp src/env.example.js src/env.js
-   # Editar src/env.js con la URL y la anon key reales
+   # Editar src/env.js — solo falta el anonKey (la URL ya está)
    ```
    `src/env.js` está en `.gitignore` — nunca se commitea.
 
-6. **Configurar producción** (GitHub Pages): hay dos opciones:
+5. **Configurar producción** (GitHub Pages): la anon key de Supabase está
+   diseñada para ser pública (RLS la protege). Opciones:
 
-   **Opción A (rápido, menos seguro)**: editar `src/env.example.js` directamente
-   en el branch `main` con la URL y anon key. La anon key de Supabase está
-   diseñada para ser pública (RLS la protege), así que es aceptable. Renombrar
-   `env.example.js` → `env.js` y quitar `env.js` del `.gitignore`.
+   **Opción A (más rápido)**: renombrar `src/env.example.js` → `src/env.js`,
+   completar el `anonKey`, quitar `env.js` del `.gitignore`, commitear y pushear.
 
-   **Opción B (recomendado)**: GitHub Actions secret + script de inyección en
-   build. Modificar [deploy.yml](deploy.yml) para que un step genere `src/env.js`
-   con `${{ secrets.SUPABASE_URL }}` y `${{ secrets.SUPABASE_ANON_KEY }}` antes
-   del upload. Es más limpio pero requiere editar el workflow.
+   **Opción B (más limpio)**: crear GitHub Actions workflow con secrets
+   `SUPABASE_ANON_KEY` y generar `env.js` en el build step. No hay workflow
+   todavía — requiere crear `.github/workflows/deploy.yml`.
 
-7. **Verificar**: abrir DevTools en local → Console → debe aparecer:
+6. **Verificar**: abrir DevTools en local → Console → debe aparecer:
    ```
-   [Supabase] Conectado a https://xxxxx.supabase.co
+   [Supabase] Conectado a https://vvqpknduifkkfywpiwkn.supabase.co
    ```
    Y al marcar una pastilla, debe aparecer una fila nueva en
    `medication_logs` desde el SQL Editor.
 
 ---
 
-### 2. Crear iconos PWA 🔴 OBLIGATORIA para instalación
+### 2. Iconos PWA ✅ COMPLETADA
 
-**Por qué**: [src/manifest.json](src/manifest.json) referencia `assets/icon-192.png`
-y `assets/icon-512.png` que **no existen**. iOS/Android usarán un icono genérico
-(captura de pantalla o letra) si faltan, lo cual queda feo y poco profesional.
+Favicon e iconos generados con RealFaviconGenerator e integrados en commit `chore: favicon`.
 
-**Pasos**:
+Archivos en `src/`:
+- `favicon.svg`, `favicon-96x96.png`, `favicon.ico` — favicon para navegadores
+- `apple-touch-icon.png` — icono para "Añadir a pantalla de inicio" en Android/iOS
+- `assets/web-app-manifest-192x192.png` + `assets/web-app-manifest-512x512.png` — iconos PWA
 
-1. Conseguir o diseñar un icono cuadrado, fondo sólido (no transparente), simple.
-   Sugerencia: corazón estilizado 🫀 sobre fondo `#1B4F72`, o las iniciales "NL".
-   Herramientas:
-   - https://realfavicongenerator.net/ (genera todas las tallas desde un PNG)
-   - https://www.figma.com (diseñar a mano)
-   - Cualquier app de imagen + plantilla 512x512
-
-2. Guardar como:
-   - `src/assets/icon-192.png` (192×192 px, PNG)
-   - `src/assets/icon-512.png` (512×512 px, PNG)
-
-3. Commit y push.
-
-4. Verificar: en iPhone Safari → "Añadir a pantalla de inicio" → debe mostrar
-   el icono diseñado, no la letra "N" genérica.
+**Verificar**: en Chrome Android → menú ⋮ → "Instalar app" → debe mostrar
+el icono de la app, no el icono genérico.
 
 ---
 
-### 3. Instalar y probar en el iPhone de Nelson 🔴 OBLIGATORIA
+### 3. Instalar y probar en el Android de Nelson 🔴 OBLIGATORIA
 
-**Por qué**: Ningún test automatizado prueba el comportamiento real en iOS. Los
-permisos de notificaciones, la persistencia del service worker y el chime de
-audio se comportan distinto entre simulador y dispositivo real.
+**Por qué**: Ningún test automatizado prueba el comportamiento real en Android.
+Los permisos de notificaciones, la persistencia del service worker, la vibración
+y el chime de audio se comportan distinto entre emulador y dispositivo real.
 
 **Pasos**:
 
-1. Seguir la sección **"Instalar en el iPhone de Nelson (PWA)"** del [README.md](README.md).
-2. Verificar específicamente en el dispositivo de Nelson (no el de Christian):
+1. Seguir la sección **"Instalar en el Android de Nelson (PWA)"** del [README.md](README.md).
+2. Verificar primero en el Android de Christian (control), después en el de Nelson:
    - [ ] El selector inicial aparece y deja elegir "Soy Nelson".
    - [ ] La elección se recuerda al cerrar y reabrir.
-   - [ ] El icono aparece correcto en el home screen (depende de la tarea 2).
-   - [ ] Al abrir desde el icono, la app va a pantalla completa (sin barra de Safari).
+   - [ ] El icono aparece correcto en pantalla principal (depende de la tarea 2).
+   - [ ] Al abrir desde el icono, la app va a pantalla completa (sin barra de Chrome).
    - [ ] Tocar "🔊 Activar voz" → suena el chime y la voz saluda.
-   - [ ] iOS pide permiso de notificaciones → conceder.
-   - [ ] Bloquear el iPhone, esperar al siguiente slot programado, verificar que llega notificación con sonido.
+   - [ ] Android pide permiso de notificaciones → conceder.
+   - [ ] El teléfono **vibra** al recibir el chime de prueba (en Android sí funciona, en iOS no).
+   - [ ] Bloquear el Android, esperar al siguiente slot programado, verificar que llega notificación con sonido.
    - [ ] Tocar la notificación → abre la app en el slot activo.
    - [ ] Marcar la pastilla → la voz dice "Muy bien Nelson. Pastilla registrada."
-   - [ ] En el iPhone del cuidador, abrir `/caregiver.html` → la marca aparece (esto solo funciona si la tarea 1 está hecha).
+   - [ ] En el Mac mini de Christian, abrir `/caregiver.html` en Chrome o Safari → la marca aparece (requiere tarea 1 hecha).
 
-3. **Si algo falla** documentar exactamente qué iOS y qué Safari version, abrir
+3. **Si algo falla**: documentar versión de Android, versión de Chrome, y abrir
    issue en el repo describiendo el comportamiento esperado vs observado.
+
+**Nota sobre el escritorio del cuidador**: Christian usa **Mac mini**. La interfaz
+del cuidador funciona idéntica en macOS Chrome/Safari/Firefox — no hay nada
+específico de plataforma en `/caregiver.html`.
 
 ---
 
@@ -169,22 +158,40 @@ Para uso personal/testing, los pasos son:
 
 ---
 
-### 5. (Opcional) Pre-grabar audio para los slots críticos 🟡
+### 5. Generar los 55 audios con Revoicer 🟡 (alta prioridad para el viaje)
 
 **Por qué**: Es la opción de máxima calidad y máxima resiliencia (no depende de
-APIs ni internet). El cuidador o un familiar graba los mensajes con voz humana real.
+APIs en runtime ni de internet). Voz humana clara — sin la rigidez de Web Speech.
+
+**Estado actual**: Los 55 archivos `.mp3` ya están **creados como placeholders
+vacíos** en `src/assets/audio/`. La app los detecta y, al fallar la reproducción
+(por estar vacíos), cae al fallback de Web Speech automáticamente. Una vez los
+reemplaces con audio real de Revoicer, se reproducen ellos.
 
 **Pasos**:
 
-1. Para cada `slot.id` del [src/protocol.json](src/protocol.json), grabar un MP3
-   con el texto de `slot.speech`. Ejemplo:
-   - `20260424_0800.mp3` ← "Buenos días Nelson. Toma la pastilla naranja."
-   - `20260424_0830.mp3` ← "Mide tu presión y oxígeno."
-2. Guardar en `src/assets/audio/`.
-3. La app los detecta automáticamente y prioriza sobre Web Speech / ElevenLabs.
+1. Abrir [docs/audio_scripts.md](docs/audio_scripts.md) — contiene los 55 guiones
+   con su nombre de archivo correspondiente (`{YYYYMMDD}_{HHMM}.mp3`).
+2. En [Revoicer](https://revoicer.com/) elegir:
+   - Idioma: **Spanish (Latin America)** o **Spanish (Spain)** — ambos funcionan.
+   - Voz: una voz **masculina cálida y pausada** (sugerencia: probar con 2-3
+     voces y elegir la que Nelson reconozca mejor en una prueba A/B).
+   - Velocidad: ~0.95x (un pelín más lento que default — ayuda con afasia).
+3. Pegar cada guion, generar, descargar como MP3.
+4. Renombrar el archivo descargado al nombre exacto de la columna "Filename"
+   de [docs/audio_scripts.md](docs/audio_scripts.md).
+5. Reemplazar el placeholder vacío en `src/assets/audio/`.
+6. Commit: `git add src/assets/audio/ && git commit -m "feat(audio): voces Revoicer para protocolo abr-may"`.
 
-**Atajo**: grabar solo los 3 slots más importantes del día del vuelo (1 de mayo)
-es ya un gran win sin tener que grabar 50 archivos.
+**Atajo si vas con prisa**: el día del vuelo (1 de mayo) tiene 8 slots. Si
+tienes que priorizar, graba primero esos 8 (`20260501_*.mp3`).
+
+**Limitación actual**: Solo `2026-04-24` está cargado en
+[src/protocol.json](src/protocol.json). Los otros 54 audios quedarán grabados
+pero **no se dispararán hasta que se expanda `protocol.json` con el resto del
+calendario** (Apr 25 → May 3, ya extraído de [nelson_companion_mvp.html](nelson_companion_mvp.html)).
+Esa migración del JSON es una tarea separada — graba los audios igual ahora,
+quedan listos para cuando se expanda.
 
 ---
 
@@ -212,20 +219,23 @@ Si no:
 
 ---
 
-### 8. (Opcional) Backup con alarmas nativas iOS 🟡 — recomendado para el viaje
+### 8. Backup con alarmas nativas Android 🟡 — recomendado para el viaje
 
 **Por qué**: Hasta que [issue #2 (push background)](https://github.com/ChristianLuciani/nelson-companion/issues/2)
-esté resuelto, no hay garantía absoluta de que las alarmas suenen con la app cerrada.
+esté resuelto, no hay garantía absoluta de que las alarmas suenen con la app
+cerrada por completo.
 
 **Pasos**:
 
-1. En el iPhone de Nelson → app **Reloj** → **Alarma** → "+".
+1. En el Android de Nelson → app **Reloj** → pestaña **Alarma** → **+**.
 2. Configurar una alarma para cada horario fijo del protocolo (08:00, 12:00, 19:00, etc.)
-   con el sonido más fuerte y `Repetir: Días de semana` o `Diariamente`.
+   con el sonido más fuerte y `Repetir: Diariamente` (o solo los días que aplica).
 3. Etiqueta de la alarma: nombre de la pastilla (ej: "Amlodipino" para la de 8am).
-4. La alarma del Reloj de iOS suena 100% confiable independientemente del estado de la app.
-   La PWA de Nelson Companion es la guía visual + voz + registro; el Reloj iOS
-   es la red de seguridad temporal.
+4. La alarma del Reloj de Android suena 100% confiable, también en modo
+   silencio si está configurada como alarma (no notificación). La PWA Nelson
+   Companion es la guía visual + voz + registro; el Reloj Android es la red
+   de seguridad mientras [issue #2](https://github.com/ChristianLuciani/nelson-companion/issues/2)
+   no esté implementado.
 
 ---
 

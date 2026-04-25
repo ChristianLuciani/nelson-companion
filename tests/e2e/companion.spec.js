@@ -8,8 +8,9 @@ const { test, expect } = require('@playwright/test');
 test.describe('Nelson Companion — flujo principal', () => {
 
   test.beforeEach(async ({ page }) => {
-    await page.goto('http://localhost:3000');
-    await page.waitForSelector('#app');
+    await page.goto('/caregiver.html');
+    // Esperar a que el protocolo cargue y la UI se renderice
+    await page.waitForSelector('.day-btn', { timeout: 5000 });
   });
 
   test('muestra la hora actual prominentemente', async ({ page }) => {

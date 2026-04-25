@@ -114,6 +114,7 @@ const Patient = (() => {
 
   function _fireAlarm(slot) {
     _playChime();
+    // Vibración: Android Chrome la respeta. iOS la ignora silenciosamente.
     if (navigator.vibrate) navigator.vibrate([220, 100, 220, 100, 440]);
     _showOSNotification(slot);
     // Voz después del chime (~600ms) para no solaparse
@@ -140,8 +141,9 @@ const Patient = (() => {
     } catch (e) { /* Audio API no disponible — silencio */ }
   }
 
-  // Notificación del SO (visible aunque la pestaña esté en background)
-  // En iOS solo funciona si la app está instalada como PWA en home screen.
+  // Notificación del SO (visible aunque la pestaña esté en background).
+  // Funciona en Android Chrome out-of-the-box; en iOS requiere PWA instalada
+  // en home screen (iOS 16.4+). Nelson y Christian usan Android.
   function _showOSNotification(slot) {
     if (typeof Notification === 'undefined') return;
     if (Notification.permission !== 'granted') return;
@@ -332,7 +334,8 @@ const Patient = (() => {
     switch (a) {
       case 'enableVoice':
         _state.voiceEnabled = true;
-        // Desbloquea AudioContext (requiere gesto de usuario en iOS)
+        // Desbloquea AudioContext (requiere gesto del usuario en navegadores
+        // móviles para permitir Web Audio sin interacción posterior)
         _playChime();
         // Pide permiso de notificación OS si está disponible
         _requestNotificationPermission();

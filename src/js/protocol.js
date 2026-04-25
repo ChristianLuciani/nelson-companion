@@ -12,7 +12,7 @@ const Protocol = (() => {
       _protocol = await res.json();
       window._protocolData = _protocol; // para exportCSV
       // Hydrate from cloud se hace en background sin bloquear UI
-      if (DB) DB.hydrateFromCloud(todayStr()).catch(e => console.warn('[DB] hydrate:', e));
+      if (typeof DB !== 'undefined' && DB) DB.hydrateFromCloud(todayStr()).catch(e => console.warn('[DB] hydrate:', e));
       return _protocol;
     } catch (e) {
       console.warn('[Protocol] load failed:', e.message);
@@ -36,17 +36,11 @@ const Protocol = (() => {
   function getCurrentSlot(dateStr, nowMin) {
     const day = getDay(dateStr);
     if (!day) return null;
+    let current = null;
     for (const slot of day.slots || []) {
-      const slotMin = timeToMin(slot.time);
-      if (slotMin <= nowMin) {
-        let hasNextSlot = false;
-        for (const s of (day.slots || [])) {
-          if (timeToMin(s.time) > nowMin) { hasNextSlot = true; break; }
-        }
-        if (hasNextSlot || slotMin === nowMin) return slot;
-      }
+      if (timeToMin(slot.time) <= nowMin) current = slot;
     }
-    return null;
+    return current;
   }
 
   function getNextSlot(dateStr, nowMin) {
