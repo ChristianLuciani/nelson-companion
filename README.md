@@ -25,49 +25,56 @@ URLs directas (para bookmark):
 
 ---
 
-## 📲 Instalar en el iPhone de Nelson (PWA)
+## 📲 Instalar en el Android de Nelson (PWA)
 
 **Importante**: para que las alarmas de voz suenen aunque la app esté en background, hay que instalarla como PWA en el home screen. Esto se hace **una sola vez**.
 
-### Paso a paso (iOS 16.4 o superior)
+### Paso a paso (Android con Chrome)
 
-1. **Abre Safari** en el iPhone (no Chrome — Apple solo permite PWA install desde Safari).
+1. **Abre Chrome** en el Android.
 2. Ve a `https://christianluciani.github.io/nelson-companion/`.
 3. Toca **🧑 Soy Nelson** y marca "Recordar mi elección".
-4. Toca el botón **Compartir** (cuadrado con flecha hacia arriba) en la barra inferior.
-5. Desplázate hacia abajo y toca **"Añadir a pantalla de inicio"**.
-6. Confirma el nombre **"Nelson"** y toca **Añadir** (arriba a la derecha).
-7. El icono aparece en la pantalla de inicio. Cierra Safari.
-8. **Abre la app desde el icono** (no desde Safari) — se ejecuta a pantalla completa.
-9. Al cargar, toca **🔊 Activar voz**. El sistema preguntará por:
+4. Toca el menú **⋮** (tres puntos arriba a la derecha) → **"Instalar app"** o **"Añadir a pantalla principal"**. Si no aparece la opción "Instalar", usa "Añadir a pantalla principal" — funciona igual.
+5. Confirma el nombre **"Nelson"** y toca **Instalar** / **Añadir**.
+6. El icono aparece en la pantalla principal. Cierra Chrome.
+7. **Abre la app desde el icono** — se ejecuta a pantalla completa, sin barra de Chrome.
+8. Al cargar, toca **🔊 Activar voz**. Android pedirá:
    - **Permiso de notificaciones** → toca **Permitir** (para alarmas con la app cerrada).
    - **Permiso de audio** → automático al tocar el botón.
-10. Listo. La app saluda a Nelson y queda lista para las alarmas del día.
+9. Listo. La app saluda a Nelson y queda activa para las alarmas del día.
+
+### En Mac mini (escritorio del cuidador)
+
+Para Christian desde su Mac mini, basta con abrir
+`https://christianluciani.github.io/nelson-companion/caregiver.html` en
+Chrome o Safari. Para tenerlo como app:
+
+- **Chrome**: menú **⋮** → **"Más herramientas → Crear acceso directo..."** → marcar "Abrir como ventana".
+- **Safari**: **Archivo → Añadir al Dock** (macOS Sonoma o superior).
 
 ### Sobre las alarmas
 
 Cuando llega la hora de un slot (pastilla, presión, comida) la app:
 
 1. **Suena un chime corto** (880Hz → 660Hz) para llamar la atención.
-2. **Vibra el teléfono** (Android — iOS no permite vibración desde web).
+2. **Vibra el teléfono** (`navigator.vibrate` — soportado por Android Chrome).
 3. **Habla el recordatorio**: "Es la hora del nebivolol", "Es hora de medir la presión", etc.
-4. **Muestra una notificación del sistema** (si el permiso está concedido) que persiste hasta que Nelson la toca.
+4. **Muestra una notificación del sistema** persistente (visible en el lockscreen, si el permiso está concedido).
 5. **Repite cada 3 minutos** durante 30 minutos hasta que Nelson marca la tarea.
 
 ### Limitaciones que Christian debe conocer
 
-- **iOS antes de 16.4** → no soporta notificaciones PWA. La voz solo suena si la app está abierta en pantalla.
-- **App cerrada por completo** → en iOS, las alarmas programadas en JavaScript no se disparan. Solución: dejar la app instalada como PWA (no cerrarla manualmente desde el switcher) y permitir notificaciones — el sistema mantiene el service worker vivo el tiempo suficiente para los pings de notificación push del backend.
-- **Para garantía absoluta** (Nelson olvida abrir la app, viaje con conexión inestable): la app aún no envía push notifications desde el servidor. Ver [issue de Background Push](https://github.com/ChristianLuciani/nelson-companion/issues) en el repo.
-- **Backup recomendado**: configurar también alarmas nativas en el iPhone (Reloj → Alarma) para los horarios fijos del protocolo, como red de seguridad.
+- **App cerrada por completo (forzada desde el switcher)** → las alarmas programadas en JavaScript dejan de dispararse. Solución: dejar la PWA en el home screen sin cerrarla manualmente — Android Chrome mantiene el service worker vivo entre slots si la app fue abierta recientemente.
+- **Para garantía absoluta** (Nelson olvida abrir la app, viaje con conexión inestable, batería baja): la app aún no envía push notifications desde el servidor. Ver [issue #2 — Background Push](https://github.com/ChristianLuciani/nelson-companion/issues/2). En Android esto es directo de implementar (FCM gratis, Web Push estándar).
+- **Backup recomendado**: configurar también alarmas nativas del Android (Reloj → Alarma) para los horarios fijos del protocolo. Ver [STATUS_HUMAN.md tarea 8](STATUS_HUMAN.md).
 
 ### Verificar que las alarmas funcionan
 
 Después de instalar:
-1. Abre la app desde el icono de home screen.
+1. Abre la app desde el icono de pantalla principal.
 2. Toca **🔊 Activar voz**.
-3. En el slot card del día, toca el botón **🔊** (a la derecha de la hora) → debe sonar la voz.
-4. Bloquea el iPhone y espera al siguiente slot programado → debe llegar la notificación.
+3. En la tarjeta del slot del día, toca el botón **🔊** (a la derecha de la hora) → debe sonar la voz.
+4. Bloquea el Android y espera al siguiente slot programado → debe llegar la notificación con sonido y vibración.
 
 ---
 
@@ -320,5 +327,9 @@ Ver `history/conversacion/sesion_clinica_2026-04.md` para el cuadro clínico com
 
 ## Filosofía de diseño
 
-> Nelson entiende. No necesita leer para actuar.
-> La voz y el color guían. Un foco a la vez.
+> Nelson entiende, y **puede leer frases cortas**. En muchos casos la lectura es
+> el único camino para que pueda producir una palabra hablada — leerla en
+> pantalla le ayuda a decirla.
+>
+> Por eso: la letra debe ser **grande**, las frases **cortas**, el contraste **alto**.
+> Voz, color y texto trabajan juntos. Un foco a la vez.
