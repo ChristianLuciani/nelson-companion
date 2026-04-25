@@ -2,8 +2,11 @@ node_modules/
 .DS_Store
 *.log
 dist/
-.env
-.env.local
 coverage/
 playwright-report/
 test-results/
+# Keys locales — NUNCA commitear
+src/env.js
+.env
+.env.local
+.env.*.local

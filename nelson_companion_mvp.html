@@ -1,0 +1,432 @@
+
+<div id="root"></div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
+<script>
+const {useState,useEffect,useRef,useCallback,useReducer}=React;
+
+const PROTOCOL_DATA={
+  '2026-04-24':{risk:'red',label:'Vie 24 Abr',
+    slots:[
+      {time:'08:00',type:'med',meds:['Amlodipino 2.5mg','Clopidogrel 75mg'],
+       speech:'Buenos días Nelson. Es hora de tomar tu amlodipino y clopidogrel. Tómalos con el desayuno.'},
+      {time:'13:41',type:'med',meds:['Nebivolol 1.25mg'],
+       speech:'Nelson, es hora de tomar el nebivolol. Es media pastilla. Tómala con algo de comer.'},
+      {time:'15:30',type:'vital',speech:'Nelson, por favor tómate la presión ahora. Anota los valores en pantalla.'},
+      {time:'17:30',type:'vital',speech:'Nelson, vuelve a tomarte la presión. Es importante registrarla ahora.'},
+      {time:'21:00',type:'med',meds:['Simvastatina 10mg'],speech:'Buenas noches Nelson. Es hora de la simvastatina. Tómala antes de dormir.'},
+    ]},
+  '2026-04-25':{risk:'yellow',label:'Sáb 25 Abr',
+    slots:[
+      {time:'07:00',type:'vital',speech:'Buenos días Nelson. Antes de levantarte, tómate la presión en cama.'},
+      {time:'08:00',type:'med',meds:['Clopidogrel 75mg','Nebivolol 2.5mg'],speech:'Nelson, es hora del clopidogrel y el nebivolol. Tómalos con el desayuno.'},
+      {time:'10:30',type:'vital',speech:'Nelson, tómate la presión ahora. Es el momento de mayor efecto del nebivolol.'},
+      {time:'12:00',type:'vital',speech:'Nelson, mide tu presión y anota los valores.'},
+      {time:'21:00',type:'med',meds:['Tamsulosina 0.4mg','Simvastatina 10mg'],speech:'Buenas noches Nelson. Es hora de la tamsulosina y la simvastatina. Tómalas después de cenar.'},
+      {time:'23:00',type:'vital',speech:'Nelson, una última medición antes de dormir. Tómate la presión.'},
+    ]},
+  '2026-04-26':{risk:'red',label:'Dom 26 Abr',
+    slots:[
+      {time:'07:00',type:'vital',speech:'Buenos días Nelson. Antes de levantarte, mide tu presión en cama.'},
+      {time:'08:00',type:'med',meds:['Amlodipino 2.5mg','Clopidogrel 75mg','Nebivolol 1.25mg'],speech:'Nelson, hoy tomas tres pastillas de la mañana: amlodipino, clopidogrel y media de nebivolol. Con desayuno completo.'},
+      {time:'10:30',type:'vital',speech:'Nelson, tómate la presión ahora. Es importante registrarla.'},
+      {time:'14:00',type:'vital',speech:'Nelson, es hora de medir la presión de la tarde.'},
+      {time:'18:00',type:'vital',speech:'Nelson, una medición más antes de la cena.'},
+      {time:'21:00',type:'med',meds:['Simvastatina 10mg'],speech:'Buenas noches Nelson. Solo la simvastatina esta noche.'},
+    ]},
+  '2026-04-27':{risk:'yellow',label:'Lun 27 Abr',
+    slots:[
+      {time:'07:00',type:'vital',speech:'Buenos días Nelson. Mide tu presión antes de levantarte.'},
+      {time:'08:00',type:'med',meds:['Clopidogrel 75mg','Nebivolol 2.5mg'],speech:'Nelson, clopidogrel y nebivolol con el desayuno.'},
+      {time:'10:30',type:'vital',speech:'Nelson, tómate la presión ahora.'},
+      {time:'21:00',type:'med',meds:['Tamsulosina 0.4mg','Simvastatina 10mg'],speech:'Buenas noches Nelson. Tamsulosina y simvastatina después de cenar.'},
+      {time:'23:00',type:'vital',speech:'Nelson, última presión del día antes de dormir.'},
+    ]},
+  '2026-04-28':{risk:'red',label:'Mar 28 Abr',
+    slots:[
+      {time:'07:00',type:'vital',speech:'Buenos días Nelson. Presión antes de levantarte.'},
+      {time:'08:00',type:'med',meds:['Amlodipino 2.5mg','Clopidogrel 75mg','Nebivolol 1.25mg'],speech:'Nelson, tus tres pastillas de la mañana: amlodipino, clopidogrel y media de nebivolol. Con desayuno.'},
+      {time:'10:30',type:'vital',speech:'Nelson, tómate la presión ahora.'},
+      {time:'14:00',type:'vital',speech:'Nelson, presión de la tarde.'},
+      {time:'21:00',type:'med',meds:['Simvastatina 10mg'],speech:'Buenas noches. Solo la simvastatina esta noche.'},
+    ]},
+  '2026-04-29':{risk:'yellow',label:'Mié 29 Abr',
+    slots:[
+      {time:'08:00',type:'med',meds:['Clopidogrel 75mg','Nebivolol 2.5mg'],speech:'Buenos días Nelson. Clopidogrel y nebivolol con el desayuno.'},
+      {time:'10:30',type:'vital',speech:'Nelson, tómate la presión.'},
+      {time:'21:00',type:'med',meds:['Tamsulosina 0.4mg','Simvastatina 10mg'],speech:'Buenas noches Nelson. Tamsulosina y simvastatina después de cenar.'},
+    ]},
+  '2026-04-30':{risk:'red',label:'Jue 30 Abr — Víspera',
+    slots:[
+      {time:'07:00',type:'vital',speech:'Buenos días Nelson. Mañana es el viaje. Mide tu presión antes de levantarte.'},
+      {time:'08:00',type:'med',meds:['Amlodipino 2.5mg','Clopidogrel 75mg','Nebivolol 1.25mg'],speech:'Nelson, tus pastillas de la mañana para el viaje de mañana: amlodipino, clopidogrel y media de nebivolol.'},
+      {time:'10:30',type:'vital',speech:'Nelson, anota esta presión. Es tu medición de referencia para el viaje.'},
+      {time:'14:00',type:'vital',speech:'Nelson, presión de la tarde.'},
+      {time:'18:00',type:'vital',speech:'Nelson, última comida grande del día. Come bien y bebe agua extra.'},
+      {time:'19:00',type:'vital',speech:'Nelson, presión antes de la cena.'},
+      {time:'21:00',type:'med',meds:['Simvastatina 10mg'],speech:'Nelson, simvastatina. Esta noche NO hay tamsulosina. Es para que el viaje sea más seguro.'},
+    ]},
+  '2026-05-01':{risk:'green',label:'Vie 1 May — VUELO ✈',
+    slots:[
+      {time:'06:00',type:'vital',speech:'Nelson, buenos días. Hoy es el día del viaje. Mide tu presión en cama antes de levantarte. Es muy importante.'},
+      {time:'06:30',type:'meal',speech:'Nelson, desayuna bien ahora. Avena con fruta. Toma agua. El desayuno es obligatorio antes de las pastillas.'},
+      {time:'07:00',type:'med',meds:['Clopidogrel 75mg','Nebivolol 2.5mg'],speech:'Nelson, dos pastillas: clopidogrel y nebivolol. Hoy NO hay amlodipino. Eso es correcto para el vuelo.'},
+      {time:'07:30',type:'vital',speech:'Nelson, última medición antes de salir. Anota los valores.'},
+      {time:'09:00',type:'reminder',speech:'Nelson, ya estás en el avión. Mueve los pies cada treinta minutos. Bebe agua seguido.'},
+      {time:'11:00',type:'vital',speech:'Nelson, mide tu presión durante el vuelo y anota los valores.'},
+      {time:'14:30',type:'reminder',speech:'Llegaste a Guayaquil Nelson. Descansa dos horas antes de salir a Cuenca. Come algo y bebe agua.'},
+      {time:'21:00',type:'med',meds:['Tamsulosina 0.4mg','Simvastatina 10mg'],speech:'Buenas noches Nelson. Llegaste a Cuenca. Tamsulosina y simvastatina después de cenar. Lo hiciste muy bien hoy.'},
+    ]},
+  '2026-05-02':{risk:'red',label:'Sáb 2 May — Cuenca',
+    slots:[
+      {time:'07:00',type:'vital',speech:'Buenos días Nelson. Estás en Cuenca. La altura puede subir la presión. Mídela antes de levantarte.'},
+      {time:'08:00',type:'med',meds:['Amlodipino 2.5mg','Clopidogrel 75mg','Nebivolol 1.25mg'],speech:'Nelson, tus tres pastillas de la mañana. Con desayuno completo.'},
+      {time:'12:00',type:'vital',speech:'Nelson, es el mediodía. Mide tu presión.'},
+      {time:'16:00',type:'vital',speech:'Nelson, presión de la tarde.'},
+      {time:'20:00',type:'vital',speech:'Nelson, presión antes de cenar.'},
+      {time:'21:00',type:'med',meds:['Tamsulosina 0.4mg','Simvastatina 10mg'],speech:'Buenas noches Nelson. Tamsulosina y simvastatina después de cenar.'},
+    ]},
+  '2026-05-03':{risk:'yellow',label:'Dom 3 May — Cuenca',
+    slots:[
+      {time:'07:00',type:'vital',speech:'Buenos días Nelson. Mide tu presión.'},
+      {time:'08:00',type:'med',meds:['Clopidogrel 75mg','Nebivolol 2.5mg'],speech:'Nelson, clopidogrel y nebivolol con el desayuno.'},
+      {time:'12:00',type:'vital',speech:'Nelson, presión del mediodía.'},
+      {time:'21:00',type:'med',meds:['Tamsulosina 0.4mg','Simvastatina 10mg'],speech:'Buenas noches Nelson. Tamsulosina y simvastatina.'},
+    ]},
+};
+
+function timeToMinutes(t){const[h,m]=t.split(':').map(Number);return h*60+m;}
+
+function getCurrentSlotIndex(slots,nowMin){
+  let best=-1;
+  for(let i=0;i<slots.length;i++){
+    const sm=timeToMinutes(slots[i].time);
+    if(sm<=nowMin)best=i;
+  }
+  return best;
+}
+
+function getNextSlotIndex(slots,nowMin){
+  for(let i=0;i<slots.length;i++){
+    if(timeToMinutes(slots[i].time)>nowMin)return i;
+  }
+  return -1;
+}
+
+function speak(text){
+  if(!window.speechSynthesis)return;
+  window.speechSynthesis.cancel();
+  const utt=new SpeechSynthesisUtterance(text);
+  utt.lang='es-ES';utt.rate=0.85;utt.pitch=1.0;utt.volume=1.0;
+  const voices=window.speechSynthesis.getVoices();
+  const esVoice=voices.find(v=>v.lang.startsWith('es')&&v.name.toLowerCase().includes('female'))
+    ||voices.find(v=>v.lang.startsWith('es'));
+  if(esVoice)utt.voice=esVoice;
+  window.speechSynthesis.speak(utt);
+}
+
+function riskBg(r){
+  return r==='red'?'var(--color-background-danger)':r==='green'?'var(--color-background-success)':'var(--color-background-warning)';
+}
+function riskText(r){
+  return r==='red'?'var(--color-text-danger)':r==='green'?'var(--color-text-success)':'var(--color-text-warning)';
+}
+function riskBorder(r){
+  return r==='red'?'var(--color-border-danger)':r==='green'?'var(--color-border-success)':'var(--color-border-warning)';
+}
+
+function App(){
+  const [now,setNow]=useState(new Date());
+  const [checks,setChecks]=useState({});
+  const [vitals,setVitals]=useState({});
+  const [speaking,setSpeaking]=useState(false);
+  const [voiceEnabled,setVoiceEnabled]=useState(false);
+  const [view,setView]=useState('main');
+  const lastSpokenRef=useRef({});
+  const timerRef=useRef();
+
+  useEffect(()=>{
+    timerRef.current=setInterval(()=>setNow(new Date()),30000);
+    window.speechSynthesis&&window.speechSynthesis.getVoices();
+    return()=>clearInterval(timerRef.current);
+  },[]);
+
+  const dateStr=now.toISOString().slice(0,10);
+  const nowMin=now.getHours()*60+now.getMinutes();
+  const dayData=PROTOCOL_DATA[dateStr];
+
+  useEffect(()=>{
+    if(!voiceEnabled||!dayData)return;
+    const si=getCurrentSlotIndex(dayData.slots,nowMin);
+    if(si<0)return;
+    const slot=dayData.slots[si];
+    const key=`${dateStr}-${si}`;
+    if(!lastSpokenRef.current[key]&&timeToMinutes(slot.time)>nowMin-5){
+      lastSpokenRef.current[key]=true;
+      setTimeout(()=>{setSpeaking(true);speak(slot.speech);setTimeout(()=>setSpeaking(false),6000);},500);
+    }
+  },[nowMin,dateStr,dayData,voiceEnabled]);
+
+  const doSpeak=useCallback((text)=>{
+    setSpeaking(true);speak(text);
+    setTimeout(()=>setSpeaking(false),8000);
+  },[]);
+
+  const pad=n=>String(n).padStart(2,'0');
+  const timeStr=`${pad(now.getHours())}:${pad(now.getMinutes())}`;
+  const days=['Dom','Lun','Mar','Mié','Jue','Vie','Sáb'];
+  const months=['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];
+  const dateLabel=`${days[now.getDay()]} ${now.getDate()} ${months[now.getMonth()]}`;
+
+  if(!dayData){
+    return React.createElement('div',{style:{padding:'2rem',textAlign:'center'}},
+      React.createElement('p',{style:{fontSize:18,color:'var(--color-text-secondary)'}},
+        'Hola Nelson. Hoy es '+dateLabel+'.'),
+      React.createElement('p',{style:{fontSize:14,color:'var(--color-text-tertiary)',marginTop:8}},
+        'El protocolo activo es del 24 Abr al 3 May 2026.')
+    );
+  }
+
+  const currentSlotIdx=getCurrentSlotIndex(dayData.slots,nowMin);
+  const nextSlotIdx=getNextSlotIndex(dayData.slots,nowMin);
+  const currentSlot=currentSlotIdx>=0?dayData.slots[currentSlotIdx]:null;
+  const nextSlot=nextSlotIdx>=0?dayData.slots[nextSlotIdx]:null;
+
+  const vKey=(si,field)=>`${dateStr}-${si}-${field}`;
+  const cKey=(si,mi)=>`${dateStr}-${si}-${mi}`;
+
+  const greeting=()=>{
+    const h=now.getHours();
+    if(h<12)return'Buenos días';
+    if(h<18)return'Buenas tardes';
+    return'Buenas noches';
+  };
+
+  const totalMeds=dayData.slots.reduce((a,s)=>a+(s.meds?s.meds.length:0),0);
+  const doneMeds=Object.keys(checks).filter(k=>k.startsWith(dateStr)&&checks[k]).length;
+  const progress=totalMeds>0?Math.round(doneMeds/totalMeds*100):0;
+
+  const TypeIcon={med:'💊',vital:'❤️',meal:'🌿',reminder:'✈️'};
+
+  if(view==='vitals'){
+    return React.createElement('div',{style:{padding:'1rem',maxWidth:400,margin:'0 auto'}},
+      React.createElement('div',{style:{display:'flex',alignItems:'center',gap:8,marginBottom:16}},
+        React.createElement('button',{onClick:()=>setView('main'),style:{fontSize:13,padding:'4px 12px',cursor:'pointer'}},
+          '← Volver'),
+        React.createElement('span',{style:{fontSize:14,fontWeight:500,color:'var(--color-text-secondary)'}},
+          'Registro de presión')
+      ),
+      dayData.slots.filter(s=>s.type==='vital').map((slot,i)=>{
+        const si=dayData.slots.indexOf(slot);
+        const sys=vKey(si,'sys'),dia=vKey(si,'dia'),pul=vKey(si,'pul');
+        const isDone=vitals[sys]&&vitals[dia]&&vitals[pul];
+        return React.createElement('div',{key:i,style:{
+          marginBottom:16,padding:'1rem',
+          background:isDone?'var(--color-background-success)':'var(--color-background-secondary)',
+          borderRadius:'var(--border-radius-lg)',
+          border:`0.5px solid ${isDone?'var(--color-border-success)':'var(--color-border-tertiary)'}`
+        }},
+          React.createElement('p',{style:{margin:'0 0 12px',fontSize:14,fontWeight:500,
+            color:isDone?'var(--color-text-success)':'var(--color-text-primary)'}},
+            slot.time+' — '+{vital:'Medición presión'}[slot.type]||'Medición'),
+          React.createElement('div',{style:{display:'grid',gridTemplateColumns:'1fr 1fr 1fr',gap:8}},
+            [['sys','Sistólica','mmHg'],['dia','Diastólica','mmHg'],['pul','Pulso','bpm']].map(([f,label,unit])=>
+              React.createElement('div',{key:f,style:{textAlign:'center'}},
+                React.createElement('p',{style:{margin:'0 0 4px',fontSize:11,color:'var(--color-text-secondary)'}},label),
+                React.createElement('input',{
+                  type:'number',inputMode:'numeric',
+                  value:vitals[vKey(si,f)]||'',
+                  onChange:e=>setVitals(v=>({...v,[vKey(si,f)]:e.target.value})),
+                  style:{width:'100%',textAlign:'center',fontSize:18,fontWeight:500,
+                    padding:'8px 4px',boxSizing:'border-box'},
+                  placeholder:'---'
+                }),
+                React.createElement('p',{style:{margin:'2px 0 0',fontSize:10,color:'var(--color-text-tertiary)'}},unit)
+              )
+            )
+          ),
+          isDone&&React.createElement('p',{style:{margin:'8px 0 0',fontSize:12,textAlign:'center',
+            color:'var(--color-text-success)'}},
+            '✓ Registrado: '+vitals[sys]+'/'+vitals[dia]+' — Pulso: '+vitals[pul])
+        )
+      })
+    );
+  }
+
+  return React.createElement('div',{style:{maxWidth:400,margin:'0 auto',paddingBottom:'2rem'}},
+
+    React.createElement('div',{style:{
+      padding:'1.25rem 1rem 1rem',
+      background:riskBg(dayData.risk),
+      borderBottom:`2px solid ${riskBorder(dayData.risk)}`
+    }},
+      React.createElement('div',{style:{display:'flex',justifyContent:'space-between',alignItems:'flex-start'}},
+        React.createElement('div',null,
+          React.createElement('p',{style:{margin:0,fontSize:13,color:riskText(dayData.risk)}},dateLabel),
+          React.createElement('p',{style:{margin:'2px 0 0',fontSize:38,fontWeight:500,
+            color:riskText(dayData.risk),lineHeight:1}},timeStr)
+        ),
+        React.createElement('div',{style:{textAlign:'right'}},
+          React.createElement('p',{style:{margin:0,fontSize:12,color:riskText(dayData.risk)}},dayData.label),
+          React.createElement('div',{style:{
+            marginTop:4,padding:'2px 10px',borderRadius:'var(--border-radius-md)',
+            background:'rgba(0,0,0,0.08)',display:'inline-block'
+          }},
+            React.createElement('span',{style:{fontSize:11,color:riskText(dayData.risk)}},
+              doneMeds+'/'+totalMeds+' pastillas')
+          )
+        )
+      ),
+      React.createElement('div',{style:{marginTop:10,height:4,background:'rgba(0,0,0,0.1)',borderRadius:2}},
+        React.createElement('div',{style:{height:'100%',width:progress+'%',
+          background:riskText(dayData.risk),borderRadius:2,transition:'width 0.3s'}})
+      )
+    ),
+
+    React.createElement('div',{style:{padding:'0.75rem 1rem'}},
+
+      !voiceEnabled&&React.createElement('div',{style:{
+        marginBottom:12,padding:'0.75rem',
+        background:'var(--color-background-info)',
+        borderRadius:'var(--border-radius-md)',
+        border:'0.5px solid var(--color-border-info)',
+        display:'flex',alignItems:'center',justifyContent:'space-between'
+      }},
+        React.createElement('p',{style:{margin:0,fontSize:12,color:'var(--color-text-info)'}},
+          'Activa la voz para que Nelson escuche los recordatorios'),
+        React.createElement('button',{
+          onClick:()=>{setVoiceEnabled(true);doSpeak(greeting()+' Nelson. Estoy aquí para ayudarte con tu medicación.');},
+          style:{fontSize:13,padding:'6px 14px',cursor:'pointer',fontWeight:500,
+            background:'var(--color-background-info)',color:'var(--color-text-info)',
+            border:'0.5px solid var(--color-border-info)',borderRadius:'var(--border-radius-md)'}
+        },'Activar voz')
+      ),
+
+      currentSlot&&React.createElement('div',{style:{
+        marginBottom:12,padding:'1rem',
+        background:'var(--color-background-secondary)',
+        borderRadius:'var(--border-radius-lg)',
+        border:'0.5px solid var(--color-border-secondary)'
+      }},
+        React.createElement('div',{style:{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:8}},
+          React.createElement('span',{style:{fontSize:12,color:'var(--color-text-secondary)'}},
+            (TypeIcon[currentSlot.type]||'📋')+' Ahora — '+currentSlot.time),
+          React.createElement('button',{
+            onClick:()=>doSpeak(currentSlot.speech),
+            disabled:speaking,
+            style:{fontSize:12,padding:'4px 12px',cursor:'pointer',
+              background:speaking?'var(--color-background-secondary)':'var(--color-text-primary)',
+              color:speaking?'var(--color-text-secondary)':'var(--color-background-primary)',
+              border:'0.5px solid var(--color-border-secondary)',
+              borderRadius:'var(--border-radius-md)'}
+          },speaking?'Hablando...':'🔊 Escuchar')
+        ),
+        currentSlot.type==='med'&&currentSlot.meds&&React.createElement('div',null,
+          currentSlot.meds.map((med,mi)=>{
+            const ck=cKey(currentSlotIdx,mi);
+            const done=!!checks[ck];
+            return React.createElement('button',{
+              key:mi,
+              onClick:()=>setChecks(c=>({...c,[ck]:!c[ck]})),
+              style:{
+                display:'flex',alignItems:'center',gap:12,width:'100%',
+                padding:'12px 14px',marginBottom:6,cursor:'pointer',textAlign:'left',
+                background:done?'var(--color-background-success)':'var(--color-background-primary)',
+                border:`0.5px solid ${done?'var(--color-border-success)':'var(--color-border-secondary)'}`,
+                borderRadius:'var(--border-radius-md)'
+              }
+            },
+              React.createElement('div',{style:{
+                width:28,height:28,borderRadius:'50%',flexShrink:0,
+                background:done?'var(--color-text-success)':'transparent',
+                border:`2px solid ${done?'var(--color-text-success)':'var(--color-border-primary)'}`,
+                display:'flex',alignItems:'center',justifyContent:'center'
+              }},done&&React.createElement('span',{style:{color:'white',fontSize:14,fontWeight:500}},'✓')),
+              React.createElement('span',{style:{
+                fontSize:16,fontWeight:500,
+                color:done?'var(--color-text-success)':'var(--color-text-primary)',
+                textDecoration:done?'line-through':'none'
+              }},med)
+            )
+          })
+        ),
+        currentSlot.type==='vital'&&React.createElement('div',null,
+          React.createElement('p',{style:{margin:'0 0 8px',fontSize:15,color:'var(--color-text-primary)'}},
+            'Toma tu presión y anota los valores'),
+          React.createElement('div',{style:{display:'grid',gridTemplateColumns:'1fr 1fr 1fr',gap:8}},
+            [['sys','Alta'],['dia','Baja'],['pul','Pulso']].map(([f,label])=>
+              React.createElement('div',{key:f,style:{textAlign:'center'}},
+                React.createElement('p',{style:{margin:'0 0 4px',fontSize:12,color:'var(--color-text-secondary)'}},label),
+                React.createElement('input',{
+                  type:'number',inputMode:'numeric',
+                  value:vitals[vKey(currentSlotIdx,f)]||'',
+                  onChange:e=>setVitals(v=>({...v,[vKey(currentSlotIdx,f)]:e.target.value})),
+                  style:{width:'100%',textAlign:'center',fontSize:22,fontWeight:500,
+                    padding:'10px 4px',boxSizing:'border-box'},
+                  placeholder:'---'
+                })
+              )
+            )
+          )
+        ),
+        (currentSlot.type==='meal'||currentSlot.type==='reminder')&&React.createElement('p',{style:{
+          margin:0,fontSize:15,color:'var(--color-text-primary)',lineHeight:1.6
+        }},currentSlot.speech)
+      ),
+
+      nextSlot&&React.createElement('div',{style:{
+        padding:'0.75rem',
+        background:'var(--color-background-secondary)',
+        borderRadius:'var(--border-radius-md)',
+        border:'0.5px solid var(--color-border-tertiary)',
+        marginBottom:12
+      }},
+        React.createElement('p',{style:{margin:'0 0 4px',fontSize:11,color:'var(--color-text-tertiary)'}},
+          'Próximo — '+nextSlot.time),
+        React.createElement('p',{style:{margin:0,fontSize:13,color:'var(--color-text-secondary)'}},
+          (TypeIcon[nextSlot.type]||'📋')+' '+
+          (nextSlot.type==='med'?(nextSlot.meds||[]).join(', '):
+           nextSlot.type==='vital'?'Medir presión arterial':'Recordatorio'))
+      ),
+
+      React.createElement('div',{style:{display:'grid',gridTemplateColumns:'1fr 1fr',gap:8,marginBottom:12}},
+        React.createElement('button',{
+          onClick:()=>setView('vitals'),
+          style:{padding:'14px',fontSize:14,cursor:'pointer',
+            background:'var(--color-background-secondary)',
+            border:'0.5px solid var(--color-border-secondary)',
+            borderRadius:'var(--border-radius-lg)',textAlign:'center',fontWeight:500}
+        },'❤️ Mis presiones'),
+        React.createElement('button',{
+          onClick:()=>{
+            const h=now.getHours();
+            const msg=h<12?'Buenos días Nelson. ¿Cómo te sientes hoy?':
+              h<18?'Buenas tardes Nelson. ¿Cómo va el día?':
+              'Buenas noches Nelson. Casi es hora de descansar.';
+            doSpeak(msg);
+          },
+          style:{padding:'14px',fontSize:14,cursor:'pointer',
+            background:'var(--color-background-secondary)',
+            border:'0.5px solid var(--color-border-secondary)',
+            borderRadius:'var(--border-radius-lg)',textAlign:'center',fontWeight:500}
+        },'🔊 Saludo')
+      ),
+
+      React.createElement('div',{style:{
+        padding:'0.75rem',
+        background:'var(--color-background-danger)',
+        borderRadius:'var(--border-radius-md)',
+        border:'0.5px solid var(--color-border-danger)'
+      }},
+        React.createElement('p',{style:{margin:'0 0 6px',fontSize:12,fontWeight:500,
+          color:'var(--color-text-danger)'}},
+          'Llamar a Christian si:'),
+        React.createElement('p',{style:{margin:0,fontSize:12,color:'var(--color-text-danger)',lineHeight:1.6}},
+          '• Presión baja de 95/60\n• Corazón muy lento (menos de 48)\n• Mareo fuerte o caída\n• Habla diferente a lo normal')
+      )
+    )
+  );
+}
+
+ReactDOM.createRoot(document.getElementById('root')).render(React.createElement(App));
+</script>
