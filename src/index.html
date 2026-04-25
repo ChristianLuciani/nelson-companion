@@ -4,108 +4,197 @@
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=no"/>
   <meta name="apple-mobile-web-app-capable" content="yes"/>
-  <meta name="theme-color" content="#1B4F72"/>
-  <link rel="icon" type="image/png" href="favicon-96x96.png" sizes="96x96" />
-  <link rel="icon" type="image/svg+xml" href="favicon.svg" />
-  <link rel="shortcut icon" href="favicon.ico" />
-  <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png" />
+  <meta name="theme-color" content="#c97456"/>
+  <link rel="icon" type="image/png" href="favicon-96x96.png" sizes="96x96"/>
+  <link rel="icon" type="image/svg+xml" href="favicon.svg"/>
+  <link rel="shortcut icon" href="favicon.ico"/>
+  <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png"/>
   <link rel="manifest" href="manifest.json"/>
   <title>Nelson Companion</title>
+  <link rel="stylesheet" href="css/theme.css"/>
   <style>
-    * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
     html, body {
-      margin: 0; padding: 0; height: 100%;
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-      background: #F4F6F8; color: #1B4F72;
+      background: var(--bg);
+      color: var(--ink);
+      font-family: var(--font-body);
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      min-height: 100vh; margin: 0;
     }
     body {
-      display: flex; flex-direction: column; align-items: center; justify-content: center;
-      padding: 1.5rem; gap: 1.25rem;
+      background:
+        radial-gradient(ellipse at 20% 10%, #f7e3c9 0%, transparent 55%),
+        radial-gradient(ellipse at 80% 90%, #e8d4be 0%, transparent 55%),
+        var(--bg);
     }
-    h1 {
-      font-size: 22px; font-weight: 500; margin: 0 0 0.25rem;
-      text-align: center; letter-spacing: -0.3px;
+
+    .mode-card {
+      width: 100%; max-width: 920px;
+      background: var(--surface);
+      border-radius: 28px;
+      padding: 48px 44px;
+      margin: 24px;
+      box-shadow:
+        0 30px 80px rgba(120,70,30,0.12),
+        0  4px 12px rgba(120,70,30,0.06);
+      border: 1px solid rgba(180,140,100,0.18);
     }
-    .subtitle {
-      font-size: 14px; color: #6B7280; margin: 0 0 1rem;
-      text-align: center; max-width: 320px;
+
+    .mode-eyebrow {
+      font-size: 11px; font-weight: 700; margin: 0 0 10px;
+      color: var(--muted); letter-spacing: 1.5px; text-transform: uppercase;
     }
-    .choice-btn {
-      display: flex; flex-direction: column; align-items: center; justify-content: center;
-      width: 100%; max-width: 360px; min-height: 130px;
-      background: #FFFFFF; color: #1B4F72;
-      border: 2px solid #1B4F72; border-radius: 16px;
-      font-size: 22px; font-weight: 500; gap: 0.5rem;
-      cursor: pointer; padding: 1.25rem;
-      transition: transform 0.1s ease, background 0.1s ease;
-      font-family: inherit;
+    .mode-card h1 {
+      font-family: var(--font-display);
+      font-size: 36px; font-weight: 800; margin: 0 0 8px; letter-spacing: -0.5px;
     }
-    .choice-btn:active { transform: scale(0.98); background: #EBF5FB; }
-    .choice-btn .icon { font-size: 44px; line-height: 1; }
-    .choice-btn .label-secondary {
-      font-size: 13px; font-weight: 400; color: #6B7280; margin-top: 0.25rem;
+    .mode-lead {
+      margin: 0 0 36px; color: var(--muted); font-size: 16px;
+      max-width: 540px; line-height: 1.55;
     }
-    .patient-btn { border-color: #1E8449; color: #1E8449; }
-    .patient-btn:active { background: #E8F8F0; }
-    .remember {
-      display: flex; align-items: center; gap: 0.5rem;
-      font-size: 13px; color: #6B7280; margin-top: 0.5rem;
+
+    .mode-grid {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 20px;
+    }
+
+    .mode-tile {
+      appearance: none;
+      border: 2px solid rgba(180,140,100,0.22);
+      background: #fff; border-radius: 22px; padding: 28px 24px;
+      text-align: left; cursor: pointer;
+      display: flex; flex-direction: column; gap: 16px;
+      transition: transform .15s, box-shadow .15s, border-color .15s;
+      font-family: inherit; min-height: 200px;
+    }
+    .mode-tile:hover, .mode-tile:focus-visible {
+      transform: translateY(-3px);
+      box-shadow: 0 14px 36px rgba(120,70,30,0.14);
+      border-color: var(--primary); outline: none;
+    }
+    .mode-tile:active { transform: translateY(0); }
+
+    .tile-icon {
+      width: 60px; height: 60px; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      color: #fff; flex-shrink: 0;
+    }
+    .mode-tile.patient  .tile-icon { background: linear-gradient(135deg, #d97757, #b85a3a); }
+    .mode-tile.caregiver .tile-icon { background: linear-gradient(135deg, #5a8b9b, #3d6c7c); }
+
+    .tile-title {
+      font-family: var(--font-display);
+      font-size: 24px; font-weight: 800; margin: 0; color: var(--ink);
+    }
+    .tile-desc {
+      margin: 0; color: var(--muted); font-size: 14px; line-height: 1.55;
+    }
+    .tile-badges {
+      display: flex; gap: 6px; flex-wrap: wrap; margin-top: auto;
+    }
+    .tile-badge {
+      font-size: 11px; font-weight: 600; padding: 4px 9px;
+      border-radius: 999px; background: var(--chip-bg); color: var(--muted);
+      letter-spacing: 0.2px;
+    }
+
+    .mode-remember {
+      display: flex; align-items: center; gap: 10px;
+      margin-top: 28px; color: var(--muted); font-size: 13px;
       cursor: pointer; user-select: none;
     }
-    .remember input { width: 18px; height: 18px; accent-color: #1B4F72; }
-    .footer {
-      position: fixed; bottom: 12px; left: 0; right: 0;
-      text-align: center; font-size: 11px; color: #9CA3AF;
+    .mode-remember input {
+      width: 16px; height: 16px; accent-color: var(--primary); cursor: pointer;
+    }
+
+    .mode-foot {
+      margin-top: 20px;
+      display: flex; justify-content: space-between;
+      color: var(--muted); opacity: 0.6; font-size: 11px;
+    }
+
+    @media (max-width: 560px) {
+      .mode-grid { grid-template-columns: 1fr; }
+      .mode-card { padding: 32px 24px; margin: 16px; }
+      .mode-card h1 { font-size: 28px; }
     }
   </style>
 </head>
 <body>
-  <h1>Nelson Companion</h1>
-  <p class="subtitle">Elige cómo vas a usar la app ahora</p>
 
-  <button class="choice-btn patient-btn" data-target="patient.html">
-    <span class="icon">🧑</span>
-    <span>Soy Nelson</span>
-    <span class="label-secondary">Mis pastillas y mediciones</span>
-  </button>
+  <div class="mode-card">
+    <p class="mode-eyebrow">Nelson Companion</p>
+    <h1>¿Cómo querés entrar hoy?</h1>
+    <p class="mode-lead">
+      Acompañamiento médico diario para Nelson. Elegí el modo según quién está usando el dispositivo.
+    </p>
 
-  <button class="choice-btn" data-target="caregiver.html">
-    <span class="icon">👩‍⚕️</span>
-    <span>Soy cuidador</span>
-    <span class="label-secondary">Vista completa, alertas, historial</span>
-  </button>
+    <div class="mode-grid">
+      <button class="mode-tile patient" data-target="patient.html">
+        <div class="tile-icon" id="icon-patient"></div>
+        <div class="tile-title">Soy Nelson</div>
+        <p class="tile-desc">
+          Una sola tarea por vez. Botones grandes, voz que te guía.
+          Tomar pastillas, presión, comidas, caminatas y un botón rojo para llamar.
+        </p>
+        <div class="tile-badges">
+          <span class="tile-badge">📱 Teléfono</span>
+          <span class="tile-badge">🔊 Voz automática</span>
+          <span class="tile-badge">Texto grande</span>
+        </div>
+      </button>
 
-  <label class="remember">
-    <input type="checkbox" id="remember"/>
-    Recordar mi elección en este dispositivo
-  </label>
+      <button class="mode-tile caregiver" data-target="caregiver.html">
+        <div class="tile-icon" id="icon-caregiver"></div>
+        <div class="tile-title">Soy cuidador</div>
+        <p class="tile-desc">
+          Vista completa con agenda, registro de presión, alertas de medicación,
+          gráficos de tendencia, notas y exportación a CSV.
+        </p>
+        <div class="tile-badges">
+          <span class="tile-badge">🖥 Escritorio</span>
+          <span class="tile-badge">Datos detallados</span>
+          <span class="tile-badge">Editar agenda</span>
+        </div>
+      </button>
+    </div>
 
-  <div class="footer">Nelson Luciani · Protocolo Abr–May 2026</div>
+    <label class="mode-remember">
+      <input type="checkbox" id="remember"/>
+      Recordar mi elección en este dispositivo
+    </label>
 
+    <div class="mode-foot">
+      <span>Nelson Luciani · Protocolo Abr–May 2026</span>
+      <span>nelson-companion.app</span>
+    </div>
+  </div>
+
+  <script src="js/icons.js"></script>
   <script>
-    (function() {
+    (function () {
+      document.getElementById('icon-patient').innerHTML   = Icons.get('user',   32, '#fff', 2.4);
+      document.getElementById('icon-caregiver').innerHTML = Icons.get('doctor', 32, '#fff', 2.4);
+
       var KEY = 'nc_user_type';
       var saved = null;
       try { saved = localStorage.getItem(KEY); } catch (_) {}
-
-      // Auto-redirect si ya hay elección guardada y no se llegó por el link "cambiar modo"
       var fromSwitch = new URLSearchParams(location.search).has('switch');
       if (saved && !fromSwitch) {
         if (saved === 'patient')   { location.replace('patient.html');   return; }
         if (saved === 'caregiver') { location.replace('caregiver.html'); return; }
       }
 
-      document.querySelectorAll('.choice-btn').forEach(function(btn) {
-        btn.addEventListener('click', function() {
+      document.querySelectorAll('.mode-tile').forEach(function (btn) {
+        btn.addEventListener('click', function () {
           var target = btn.dataset.target;
           var remember = document.getElementById('remember').checked;
-          if (remember) {
-            try {
+          try {
+            if (remember) {
               localStorage.setItem(KEY, target === 'patient.html' ? 'patient' : 'caregiver');
-            } catch (_) {}
-          } else {
-            try { localStorage.removeItem(KEY); } catch (_) {}
-          }
+            } else {
+              localStorage.removeItem(KEY);
+            }
+          } catch (_) {}
           location.href = target;
         });
       });

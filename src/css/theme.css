@@ -1,0 +1,91 @@
+/* ============================================================
+   Nelson Companion — Design Tokens & Themes
+   Extraídos del prototipo /New Desing/Nelson Companion.html
+   Tres paletas: warm (default), clinical, high-contrast
+   ============================================================ */
+
+/* ── Google Fonts ───────────────────────────────────────────── */
+@import url('https://fonts.googleapis.com/css2?family=Nunito:wght@500;600;700;800&family=Inter:wght@400;500;600;700&display=swap');
+
+/* ── Tema cálido (default) ──────────────────────────────────── */
+:root,
+[data-theme="warm"] {
+  --bg:          #f4ede2;
+  --surface:     #fffaf2;
+  --sidebar:     #ede1cf;
+  --chip-bg:     #ebe0cd;
+  --border:      #e0d2bc;
+  --ink:         #2a221a;
+  --muted:       #7a6c58;
+  --primary:     #c97456;
+  --primary-dim: #e6b9a4;
+
+  /* Alias semánticos */
+  --danger:      #c9302c;
+  --danger-bg:   #fbeae9;
+  --danger-border:#e8b8b3;
+  --warn:        #a8762a;
+  --warn-bg:     #fbf3e0;
+  --warn-border: #e8d8a8;
+  --ok:          #2f6020;
+  --ok-bg:       #e2efe1;
+  --ok-border:   #b8d8b0;
+
+  /* Radios y espaciados clave */
+  --radius-sm:   8px;
+  --radius-md:   14px;
+  --radius-lg:   22px;
+  --radius-xl:   28px;
+  --radius-full: 9999px;
+
+  /* Tipografía */
+  --font-display: 'Nunito', system-ui, sans-serif;
+  --font-body:    'Inter', system-ui, sans-serif;
+
+  /* Escala de texto — modificada por .text-large / .text-huge */
+  --scale: 1.0;
+}
+
+/* ── Tema clínico ────────────────────────────────────────────── */
+[data-theme="clinical"] {
+  --bg:          #f4f6f9;
+  --surface:     #ffffff;
+  --sidebar:     #eef1f6;
+  --chip-bg:     #e3e8ef;
+  --border:      #dce2eb;
+  --ink:         #1a2230;
+  --muted:       #6a7689;
+  --primary:     #3d7ca8;
+  --primary-dim: #a8c8de;
+}
+
+/* ── Alto contraste ──────────────────────────────────────────── */
+[data-theme="high-contrast"] {
+  --bg:          #ffffff;
+  --surface:     #f6f6f6;
+  --sidebar:     #1a1a1a;
+  --chip-bg:     #e0e0e0;
+  --border:      #1a1a1a;
+  --ink:         #000000;
+  --muted:       #3a3a3a;
+  --primary:     #000000;
+  --primary-dim: #a0a0a0;
+}
+
+/* ── Escalas de texto ────────────────────────────────────────── */
+[data-text-scale="large"]  { --scale: 1.15; }
+[data-text-scale="huge"]   { --scale: 1.32; }
+
+/* ── Reset mínimo ────────────────────────────────────────────── */
+*, *::before, *::after {
+  box-sizing: border-box;
+  -webkit-tap-highlight-color: transparent;
+}
+
+html, body {
+  margin: 0; padding: 0; min-height: 100%;
+  -webkit-text-size-adjust: 100%;
+  -webkit-font-smoothing: antialiased;
+}
+
+button { font-family: inherit; }
