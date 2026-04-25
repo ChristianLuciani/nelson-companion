@@ -12,17 +12,26 @@ const App = (() => {
 
   // ── INIT ──────────────────────────────────────────────────────────────
   async function init() {
-    _protocol = await Protocol.load();
-    if (window.TTS_CONFIG) TTS.configure(window.TTS_CONFIG);
-    TTS.onSpeakStart(() => render());
-    TTS.onSpeakEnd(()   => render());
-    window.speechSynthesis?.addEventListener('voiceschanged', ()=>{});
+    try {
+      SupabaseClient.init();
+      _protocol = await Protocol.load();
+      if (!_protocol || !_protocol.days) {
+        throw new Error('Protocol failed to load or empty');
+      }
+      if (window.TTS_CONFIG) TTS.configure(window.TTS_CONFIG);
+      TTS.onSpeakStart(() => render());
+      TTS.onSpeakEnd(()   => render());
+      window.speechSynthesis?.addEventListener('voiceschanged', ()=>{});
 
-    const today = _todayStr();
-    _state.selectedDate = _protocol.days?.[today] ? today : Object.keys(_protocol.days||{})[0];
+      const today = _todayStr();
+      _state.selectedDate = _protocol.days?.[today] ? today : Object.keys(_protocol.days||{})[0];
 
-    _clockInterval = setInterval(() => { _autoSpeak(); render(); }, 30000);
-    render();
+      _clockInterval = setInterval(() => { _autoSpeak(); render(); }, 30000);
+      render();
+    } catch (e) {
+      console.error('[App.init] Error:', e.message);
+      document.getElementById('app').innerHTML = `<div style="color:red;padding:2rem">${e.message}</div>`;
+    }
   }
 
   // ── HELPERS ───────────────────────────────────────────────────────────
@@ -194,7 +203,7 @@ const App = (() => {
         }).join('') : ''}
         ${slot.type==='vital' ? `
           <div class="vital-grid">
-            ${[['sys','Alta','mmHg'],['dia','Baja','mmHg'],['pul','Pulso','bpm']].map(([f,l,u])=>`
+            ${[['sys','Alta','mmHg'],['dia','Baja','mmHg'],['pul','Pulso','bpm'],['spo2','SpO₂','%']].map(([f,l,u])=>`
               <div class="vital-field">
                 <label>${l}</label>
                 <input type="number" inputmode="numeric" placeholder="---"
@@ -224,16 +233,17 @@ const App = (() => {
     if (!day) return '';
     const vitalSlots = (day.slots||[]).filter(s=>s.type==='vital');
     if (!vitalSlots.length) return `<p style="padding:1rem;color:#888;font-size:14px">Sin mediciones programadas hoy.</p>`;
-    let html = `<div class="section-header">Registro de presión — ${day.label}</div>`;
+    let html = `<div class="section-header">Registro de presión y oxígeno — ${day.label}</div>`;
     for (const slot of vitalSlots) {
       const sys = Protocol.getVital(slot.id,'sys');
       const dia = Protocol.getVital(slot.id,'dia');
       const pul = Protocol.getVital(slot.id,'pul');
+      const spo2 = Protocol.getVital(slot.id,'spo2');
       const done = sys && dia && pul;
       html += `<div class="slot-card ${done?'':''}">
         <div class="slot-time">${slot.time}</div>
         <div class="vital-grid">
-          ${[['sys','Sistólica','mmHg'],['dia','Diastólica','mmHg'],['pul','Pulso','bpm']].map(([f,l,u])=>`
+          ${[['sys','Sistólica','mmHg'],['dia','Diastólica','mmHg'],['pul','Pulso','bpm'],['spo2','SpO₂','%']].map(([f,l,u])=>`
             <div class="vital-field">
               <label>${l}</label>
               <input type="number" inputmode="numeric" placeholder="---"
@@ -243,7 +253,7 @@ const App = (() => {
             </div>`).join('')}
         </div>
         ${done ? `<p style="margin-top:8px;font-size:12px;color:#1E8449;text-align:center">
-          ✓ ${sys}/${dia} mmHg &nbsp;·&nbsp; Pulso ${pul} bpm</p>` : ''}
+          ✓ ${sys}/${dia} mmHg &nbsp;·&nbsp; Pulso ${pul} bpm${spo2 ? ` &nbsp;·&nbsp; SpO₂ ${spo2}%` : ''}</p>` : ''}
       </div>`;
     }
     return html;

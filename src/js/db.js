@@ -174,7 +174,7 @@ const DB = (() => {
   function exportCSV() {
     const checks = _lsGet('checks', {});
     const vitals = _lsGet('vitals', {});
-    const rows   = ['date,slotId,time,type,medId,medName,dose,checked,sys,dia,pul,note'];
+    const rows   = ['date,slotId,time,type,medId,medName,dose,checked,sys,dia,pul,spo2,note'];
 
     // Reconstruir desde protocol si está disponible
     const days = window._protocolData?.days || {};
@@ -184,10 +184,10 @@ const DB = (() => {
         if (slot.meds?.length) {
           slot.meds.forEach((m, i) => {
             const ck = checks[`${slot.id}_${i}`] ? 1 : 0;
-            rows.push(`${date},${slot.id},${slot.time},med,${m.id||m},${m.name||m},${m.dose||''},${ck},${v.sys||''},${v.dia||''},${v.pul||''},`);
+            rows.push(`${date},${slot.id},${slot.time},med,${m.id||m},${m.name||m},${m.dose||''},${ck},${v.sys||''},${v.dia||''},${v.pul||''},${v.spo2||''},`);
           });
         } else if (slot.type === 'vital') {
-          rows.push(`${date},${slot.id},${slot.time},vital,,,,0,${v.sys||''},${v.dia||''},${v.pul||''},${v.note||''}`);
+          rows.push(`${date},${slot.id},${slot.time},vital,,,,0,${v.sys||''},${v.dia||''},${v.pul||''},${v.spo2||''},${v.note||''}`);
         }
       }
     }

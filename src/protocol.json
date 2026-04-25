@@ -1,0 +1,19 @@
+{
+  "patient": { "name": "Nelson" },
+  "medications": {
+    "amlodipino": { "name": "Amlodipino", "dose": "2.5mg", "description": "Pastilla naranja" },
+    "nebivolol": { "name": "Nebivolol", "dose": "1.25mg", "description": "Pastilla azul" },
+    "simvastatina": { "name": "Simvastatina", "dose": "20mg", "description": "Pastilla roja" }
+  },
+  "days": {
+    "2026-04-24": {
+      "label": "Jue 24 Abr", "risk": "yellow",
+      "slots": [
+        { "id": "20260424_0800", "time": "08:00", "type": "med", "meds": [{"id": "amlodipino", "name": "Amlodipino", "dose": "2.5mg"}], "speech": "Buenos días Nelson. Toma la pastilla naranja." },
+        { "id": "20260424_0830", "time": "08:30", "type": "vital", "speech": "Mide tu presión y oxígeno." },
+        { "id": "20260424_1200", "time": "12:00", "type": "med", "meds": [{"id": "nebivolol", "name": "Nebivolol", "dose": "1.25mg"}], "speech": "Es la hora del nebivolol." },
+        { "id": "20260424_1900", "time": "19:00", "type": "med", "meds": [{"id": "simvastatina", "name": "Simvastatina", "dose": "20mg"}], "speech": "Toma la pastilla roja antes de dormir." }
+      ]
+    }
+  }
+}
