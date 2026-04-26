@@ -11,7 +11,7 @@
   <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png"/>
   <link rel="manifest" href="manifest.json"/>
   <title>Nelson Companion</title>
-  <script>(function(){var t=localStorage.getItem('nc_theme');if(t)document.documentElement.dataset.theme=t;})()</script>
+  <script>(function(){var t=localStorage.getItem('nc_theme');if(!t){var h=new Date().getHours();t=(h>=21||h<7)?'high-contrast':'warm';}document.documentElement.dataset.theme=t;})()</script>
   <link rel="stylesheet" href="css/theme.css"/>
   <style>
     html, body {

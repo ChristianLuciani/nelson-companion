@@ -15,9 +15,10 @@ const Patient = (() => {
     taskIdx: 0,
     showDone: false,
     sosOpen: false,
-    bpStep: 'intro',  // intro | sys | dia | confirm
+    bpStep: 'intro',  // intro | sys | dia | pul | confirm
     bpSys: 130,
     bpDia: 80,
+    bpPul: 70,
     walkSec: 0,
     walkRunning: false,
     walkInterval: null,
@@ -353,14 +354,19 @@ const Patient = (() => {
         </button>
       `);
     }
-    if (step === 'sys' || step === 'dia') {
+    if (step === 'sys' || step === 'dia' || step === 'pul') {
+      const isPul = step === 'pul';
       const isSys = step === 'sys';
-      const value = isSys ? _state.bpSys : _state.bpDia;
-      const label = isSys ? 'Número de arriba' : 'Número de abajo';
+      const value = isPul ? _state.bpPul : (isSys ? _state.bpSys : _state.bpDia);
+      const label = isPul ? 'Pulso' : (isSys ? 'Número de arriba' : 'Número de abajo');
+      const sub   = isPul ? '(latidos por minuto)' : (isSys ? '(sistólica)' : '(diastólica)');
+      const replayText = isPul
+        ? `El pulso es ${value}.`
+        : `El ${isSys ? 'número de arriba' : 'número de abajo'} es ${value}.`;
       return _taskArea(`
         <div class="p-bp-label">
           <div class="p-bp-label-main">${label}</div>
-          <div class="p-bp-label-sub">${isSys ? '(sistólica)' : '(diastólica)'}</div>
+          <div class="p-bp-label-sub">${sub}</div>
         </div>
         <div class="p-bp-stepper">
           <button class="p-bp-step-btn" data-action="bpAdj" data-delta="-1">${Icons.get('minus', 44, '#fff', 3.2)}</button>
@@ -372,7 +378,7 @@ const Patient = (() => {
             `<button class="p-bp-jump" data-action="bpAdj" data-delta="${d}">${d > 0 ? '+' + d : d}</button>`
           ).join('')}
         </div>
-        ${_replayBtn(`El ${isSys ? 'número de arriba' : 'número de abajo'} es ${value}.`)}
+        ${_replayBtn(replayText)}
         <button class="p-listo primary" data-action="bpNext">
           ${Icons.get('arrow-right', 42, '#fff', 3)} SIGUIENTE
         </button>
@@ -384,8 +390,9 @@ const Patient = (() => {
       <div style="text-align:center">
         <p class="p-bp-confirm">Tu presión es</p>
         <div class="p-bp-result">${_state.bpSys}/${_state.bpDia}</div>
+        <p class="p-bp-confirm" style="margin-top:10px">Pulso: <strong>${_state.bpPul}</strong> lpm</p>
       </div>
-      ${_replayBtn(`Tu presión es ${_state.bpSys} sobre ${_state.bpDia}.`)}
+      ${_replayBtn(`Tu presión es ${_state.bpSys} sobre ${_state.bpDia}. Pulso ${_state.bpPul}.`)}
       <button class="p-bp-redo" data-action="bpRedo">Volver a escribir</button>
       ${_listoBtn('GUARDAR')}
     `);
@@ -498,10 +505,13 @@ const Patient = (() => {
         if (!slot && !_state.showDone) break;
 
         if (_state.showDone) {
+          // Navigation tap — short single pulse
+          if (navigator.vibrate) navigator.vibrate(60);
           _state.showDone = false;
           _state.bpStep = 'intro';
           _state.bpSys  = 130;
           _state.bpDia  = 80;
+          _state.bpPul  = 70;
           if (_state.taskIdx < slots.length - 1) _state.taskIdx++;
           render();
           break;
@@ -513,11 +523,13 @@ const Patient = (() => {
             if (!Protocol.isChecked(slot.id, i)) Protocol.toggleCheck(slot.id, i);
           });
         } else if (slot.type === 'vital') {
-          // saved via bpNext confirm path
+          // saved via bpNext confirm path (capture listener below)
         } else {
           if (!Protocol.isChecked(slot.id, 0)) Protocol.toggleCheck(slot.id, 0);
         }
 
+        // Confirmation tap — double pulse = success feel
+        if (navigator.vibrate) navigator.vibrate([80, 60, 120]);
         if (_state.voiceEnabled) TTS.speak('Muy bien Nelson. Lo hiciste.');
         _state.showDone = true;
         render();
@@ -532,19 +544,26 @@ const Patient = (() => {
           _state.bpStep = 'dia';
           if (_state.voiceEnabled) TTS.speak('Ahora el número de abajo.');
         } else if (_state.bpStep === 'dia') {
+          _state.bpStep = 'pul';
+          if (_state.voiceEnabled) TTS.speak('Ahora el pulso.');
+        } else if (_state.bpStep === 'pul') {
           _state.bpStep = 'confirm';
-          if (_state.voiceEnabled) TTS.speak(`Tu presión es ${_state.bpSys} sobre ${_state.bpDia}. ¿Está bien?`);
+          if (_state.voiceEnabled) TTS.speak(`Tu presión es ${_state.bpSys} sobre ${_state.bpDia}. Pulso ${_state.bpPul}. ¿Está bien?`);
         }
         render();
         break;
 
       case 'bpAdj': {
         const delta = parseInt(el.dataset.delta, 10);
-        const isSys = _state.bpStep === 'sys';
-        if (isSys) _state.bpSys = Math.max(40, Math.min(260, _state.bpSys + delta));
-        else        _state.bpDia = Math.max(30, Math.min(180, _state.bpDia + delta));
+        if (_state.bpStep === 'sys') _state.bpSys = Math.max(40,  Math.min(260, _state.bpSys + delta));
+        if (_state.bpStep === 'dia') _state.bpDia = Math.max(30,  Math.min(180, _state.bpDia + delta));
+        if (_state.bpStep === 'pul') _state.bpPul = Math.max(30,  Math.min(200, _state.bpPul + delta));
         const display = document.getElementById('bp-value-display');
-        if (display) display.textContent = isSys ? _state.bpSys : _state.bpDia;
+        if (display) {
+          if (_state.bpStep === 'sys') display.textContent = _state.bpSys;
+          if (_state.bpStep === 'dia') display.textContent = _state.bpDia;
+          if (_state.bpStep === 'pul') display.textContent = _state.bpPul;
+        }
         break;
       }
 
@@ -573,6 +592,7 @@ const Patient = (() => {
         if (slot?.type === 'vital' && _state.bpStep === 'confirm') {
           Protocol.saveVital(slot.id, 'sys', _state.bpSys);
           Protocol.saveVital(slot.id, 'dia', _state.bpDia);
+          Protocol.saveVital(slot.id, 'pul', _state.bpPul);
         }
         _closeSOS();
         if (_state.voiceEnabled) TTS.speak(`Llamando a ${el.dataset.name}.`);
@@ -590,6 +610,7 @@ const Patient = (() => {
     if (slot?.type === 'vital' && _state.bpStep === 'confirm') {
       Protocol.saveVital(slot.id, 'sys', _state.bpSys);
       Protocol.saveVital(slot.id, 'dia', _state.bpDia);
+      Protocol.saveVital(slot.id, 'pul', _state.bpPul);
     }
   }, true);
 
