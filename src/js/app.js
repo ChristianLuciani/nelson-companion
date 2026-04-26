@@ -899,4 +899,5 @@ const App = (() => {
   return { init };
 })();
 
-document.addEventListener('DOMContentLoaded', () => App.init());
+if (typeof module !== 'undefined') module.exports = App;
+else document.addEventListener('DOMContentLoaded', () => App.init());

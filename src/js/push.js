@@ -105,3 +105,5 @@ const Push = (() => {
 
   return { request, getStatus, getSubscription, unsubscribe };
 })();
+
+if (typeof module !== 'undefined') module.exports = Push;

@@ -673,4 +673,5 @@ const Patient = (() => {
   return { init };
 })();
 
-document.addEventListener('DOMContentLoaded', () => Patient.init());
+if (typeof module !== 'undefined') module.exports = Patient;
+else document.addEventListener('DOMContentLoaded', () => Patient.init());
