@@ -19,6 +19,7 @@ const App = (() => {
   // ── INIT ──────────────────────────────────────────────────────────────
   async function init() {
     try {
+      document.documentElement.dataset.theme = _getTheme();
       SupabaseClient.init();
       _protocol = await Protocol.load();
       if (!_protocol || !_protocol.days) throw new Error('Protocol failed to load');
@@ -113,6 +114,15 @@ const App = (() => {
     _saveNotes(notes);
   }
 
+  // ── THEME ─────────────────────────────────────────────────────────────
+  function _getTheme() {
+    return localStorage.getItem('nc_theme') || 'warm';
+  }
+  function _setTheme(name) {
+    localStorage.setItem('nc_theme', name);
+    document.documentElement.dataset.theme = name;
+  }
+
   // ── EXPORT ────────────────────────────────────────────────────────────
   function _exportCSV() {
     const csv  = Protocol.exportCSV();
@@ -151,28 +161,34 @@ const App = (() => {
       const slots      = day.slots || [];
       const medSlots   = slots.filter(s => s.type === 'med');
       const vitalSlots = slots.filter(s => s.type === 'vital');
+      const walkSlots  = slots.filter(s => s.type === 'walk');
+      const mealSlots  = slots.filter(s => s.type === 'meal');
 
       const totalMeds = medSlots.reduce((a, s) => a + (s.meds?.length || 0), 0);
       const doneMeds  = medSlots.reduce((a, s) =>
         a + (s.meds || []).filter((_, i) => Protocol.isChecked(s.id, i)).length, 0);
+      const medStatus = totalMeds === 0 ? 'none'
+        : doneMeds === totalMeds ? 'ok' : doneMeds > 0 ? 'late' : 'missed';
 
       const totalVitals = vitalSlots.length;
       const doneVitals  = vitalSlots.filter(s =>
         Protocol.getVital(s.id, 'sys') && Protocol.getVital(s.id, 'dia')).length;
-
-      const medStatus = totalMeds === 0 ? 'none'
-        : doneMeds === totalMeds ? 'ok'
-        : doneMeds > 0           ? 'late' : 'missed';
-
       const vitalStatus = totalVitals === 0 ? 'none'
-        : doneVitals === totalVitals ? 'ok'
-        : doneVitals > 0             ? 'late' : 'missed';
+        : doneVitals === totalVitals ? 'ok' : doneVitals > 0 ? 'late' : 'missed';
 
-      const counted = [medStatus, vitalStatus].filter(s => s !== 'none');
+      const doneWalk  = walkSlots.filter(s => Protocol.isChecked(s.id, 0)).length;
+      const walkStatus = walkSlots.length === 0 ? 'none'
+        : doneWalk === walkSlots.length ? 'ok' : doneWalk > 0 ? 'late' : 'missed';
+
+      const doneMeal  = mealSlots.filter(s => Protocol.isChecked(s.id, 0)).length;
+      const mealStatus = mealSlots.length === 0 ? 'none'
+        : doneMeal === mealSlots.length ? 'ok' : doneMeal > 0 ? 'late' : 'missed';
+
+      const counted = [medStatus, vitalStatus, walkStatus, mealStatus].filter(s => s !== 'none');
       const okCount = counted.filter(s => s === 'ok').length;
       const pct = counted.length > 0 ? Math.round(okCount / counted.length * 100) : null;
 
-      return { dateStr, label: _shortDayLabel(dateStr), medStatus, vitalStatus, pct, totalMeds, doneMeds };
+      return { dateStr, label: _shortDayLabel(dateStr), medStatus, vitalStatus, walkStatus, mealStatus, pct };
     }).filter(Boolean);
   }
 
@@ -284,6 +300,26 @@ const App = (() => {
     _attachEvents();
   }
 
+  // ── THEME SELECTOR ────────────────────────────────────────────────────
+  function _renderThemeSelector() {
+    const cur = _getTheme();
+    const themes = [
+      { id: 'warm',          label: 'Cálido',    color: '#c97456' },
+      { id: 'clinical',      label: 'Clínico',   color: '#3d7ca8' },
+      { id: 'high-contrast', label: 'Contraste', color: '#000000' },
+    ];
+    const dots = themes.map(t => `
+      <button class="cg-theme-dot ${cur === t.id ? 'active' : ''}"
+        data-action="setTheme" data-theme="${t.id}"
+        title="${t.label}"
+        style="background:${t.color}">
+      </button>`).join('');
+    return `<div class="cg-theme-row">
+      <span class="cg-theme-label">Tema</span>
+      <div class="cg-theme-dots">${dots}</div>
+    </div>`;
+  }
+
   // ── SIDEBAR ───────────────────────────────────────────────────────────
   function _renderSidebar() {
     const tabs = [
@@ -317,6 +353,7 @@ const App = (() => {
       </div>
       ${navBtns}
       <div class="cg-spacer"></div>
+      ${_renderThemeSelector()}
       <button class="cg-export-btn" data-action="export">
         ${Icons.get('export', 15, 'currentColor', 2)}
         Exportar CSV
@@ -531,6 +568,8 @@ const App = (() => {
         <td class="left">${r.label}</td>
         ${_compCell(r.medStatus)}
         ${_compCell(r.vitalStatus)}
+        ${_compCell(r.walkStatus)}
+        ${_compCell(r.mealStatus)}
         <td style="text-align:right;padding:7px 8px">
           <span class="comp-pct ${pctColor(r.pct)}">${r.pct != null ? r.pct + '%' : '—'}</span>
         </td>
@@ -547,8 +586,10 @@ const App = (() => {
       <thead>
         <tr>
           <th class="left">Día</th>
-          <th>Medicamentos</th>
-          <th>Presión</th>
+          <th title="Medicamentos">Meds</th>
+          <th title="Presión arterial">PA</th>
+          <th title="Caminata">Caminar</th>
+          <th title="Comidas">Comida</th>
           <th style="text-align:right">%</th>
         </tr>
       </thead>
@@ -786,6 +827,8 @@ const App = (() => {
         _exportCSV(); break;
       case 'print':
         window.print(); break;
+      case 'setTheme':
+        _setTheme(el.dataset.theme); render(); break;
       case 'addNote':
         _state.tab = 'notes'; render(); break;
       case 'enableVoice':

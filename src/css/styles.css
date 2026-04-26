@@ -401,6 +401,26 @@ html, body {
 .bp-badge.low  { background: var(--warn-bg);   color: var(--warn); }
 .bp-badge.ok   { background: var(--ok-bg);     color: var(--ok); }
 
+/* ── Theme selector ─────────────────────────────────────────── */
+.cg-theme-row {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 6px 8px; margin-bottom: 4px;
+}
+.cg-theme-label {
+  font-size: 11px; font-weight: 600; color: var(--muted);
+  text-transform: uppercase; letter-spacing: 0.5px;
+}
+.cg-theme-dots { display: flex; gap: 7px; }
+.cg-theme-dot {
+  width: 18px; height: 18px; border-radius: 50%;
+  border: 2px solid transparent; cursor: pointer;
+  padding: 0; transition: transform .1s;
+}
+.cg-theme-dot.active {
+  border-color: var(--ink); transform: scale(1.2);
+}
+.cg-theme-dot:hover { transform: scale(1.15); }
+
 /* ── Mobile ──────────────────────────────────────────────────── */
 @media (max-width: 768px) {
   .cg-layout { grid-template-columns: 1fr; }
