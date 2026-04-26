@@ -144,8 +144,9 @@ const App = (() => {
           const sys = parseInt(Protocol.getVital(slot.id, 'sys'));
           const dia = parseInt(Protocol.getVital(slot.id, 'dia'));
           const pul = parseInt(Protocol.getVital(slot.id, 'pul'));
+          const spo2 = parseInt(Protocol.getVital(slot.id, 'spo2'));
           if (sys > 0 && dia > 0) {
-            history.push({ date: dateStr, slot: slot.time, sys, dia, pul: pul || 0 });
+            history.push({ date: dateStr, slot: slot.time, sys, dia, pul: pul || 0, spo2: spo2 || null });
           }
         }
       }
@@ -612,12 +613,16 @@ const App = (() => {
       const high = r.sys > 145 || r.dia > 95;
       const low  = r.sys < 95;
       const badge = `<span class="bp-badge ${high ? 'high' : low ? 'low' : 'ok'}">${high ? 'Alta' : low ? 'Baja' : 'Normal'}</span>`;
+      const spo2Cell = r.spo2
+        ? `<span class="bp-badge ${r.spo2 < 94 ? 'high' : r.spo2 < 97 ? 'low' : 'ok'}">${r.spo2}%</span>`
+        : '<span style="color:var(--muted)">—</span>';
       return `<tr>
         <td>${r.date.slice(5).replace('-', '/')}</td>
         <td style="color:var(--muted)">${r.slot}</td>
         <td class="right" style="font-weight:600">${r.sys}</td>
         <td class="right" style="font-weight:600">${r.dia}</td>
         <td class="right" style="color:var(--muted)">${r.pul || '—'}</td>
+        <td class="right">${spo2Cell}</td>
         <td class="right">${badge}</td>
       </tr>`;
     }).join('');
@@ -627,7 +632,12 @@ const App = (() => {
         ${_kpi('Última lectura', lastBP ? `${lastBP.sys}/${lastBP.dia}` : '—/—', lastBP ? `Hoy ${lastBP.slot}` : 'Sin datos', bpTone)}
         ${_kpi('Promedio sistólica', avgSys ?? '—', 'mmHg', avgSys > 140 ? 'warn' : 'good')}
         ${_kpi('Promedio diastólica', avgDia ?? '—', 'mmHg', avgDia > 90 ? 'warn' : 'good')}
-        ${_kpi('Lecturas totales', bpHist.length, `${bpHist.length} lectura${bpHist.length !== 1 ? 's' : ''} registrada${bpHist.length !== 1 ? 's' : ''}`, 'good')}
+        ${(() => {
+          const spo2Readings = bpHist.filter(r => r.spo2);
+          const avgSpo2 = spo2Readings.length
+            ? Math.round(spo2Readings.reduce((a, r) => a + r.spo2, 0) / spo2Readings.length) : null;
+          return _kpi('SpO₂ promedio', avgSpo2 ? `${avgSpo2}%` : '—', avgSpo2 ? `Sobre ${spo2Readings.length} lectura${spo2Readings.length !== 1 ? 's' : ''}` : 'Oxímetro opcional', avgSpo2 && avgSpo2 < 94 ? 'bad' : 'good');
+        })()}
       </div>
       ${_card('Tendencia presión arterial', _buildBPChartSVG(bpHist, false), { action: 'mmHg · rango normal sombreado' })}
       ${_card('Lecturas recientes', bpHist.length === 0
@@ -637,7 +647,7 @@ const App = (() => {
               <tr>
                 <th>Fecha</th><th>Momento</th>
                 <th class="right">Sistólica</th><th class="right">Diastólica</th>
-                <th class="right">Pulso</th><th class="right">Estado</th>
+                <th class="right">Pulso</th><th class="right">SpO₂</th><th class="right">Estado</th>
               </tr>
             </thead>
             <tbody>${tableRows}</tbody>

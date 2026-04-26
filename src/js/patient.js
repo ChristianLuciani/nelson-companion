@@ -15,10 +15,11 @@ const Patient = (() => {
     taskIdx: 0,
     showDone: false,
     sosOpen: false,
-    bpStep: 'intro',  // intro | sys | dia | pul | confirm
+    bpStep: 'intro',  // intro | sys | dia | pul | spo2 | confirm
     bpSys: 130,
     bpDia: 80,
     bpPul: 70,
+    bpSpo2: null,     // null = no medido (oxímetro opcional)
     walkSec: 0,
     walkRunning: false,
     walkInterval: null,
@@ -230,8 +231,15 @@ const Patient = (() => {
   }
 
   function _renderVoiceBanner() {
+    const notifGranted = _state.notifPermission === 'granted';
+    const notifBlocked = _state.notifPermission === 'denied';
+    const notifHint = notifGranted
+      ? '· Notificaciones activas'
+      : notifBlocked
+      ? '· Notificaciones bloqueadas en ajustes del navegador'
+      : '· Activar también pedirá permiso para notificaciones';
     return `<div class="p-voice-banner">
-      <p>Activá la voz para escuchar los recordatorios</p>
+      <p>Activá la voz para escuchar los recordatorios <span style="font-size:14px;opacity:.7">${notifHint}</span></p>
       <button class="p-voice-unlock-btn" data-action="enableVoice">
         ${Icons.get('speaker', 24, '#fff', 2.4)} Activar voz
       </button>
@@ -384,15 +392,46 @@ const Patient = (() => {
         </button>
       `);
     }
+    // spo2 — optional step with SALTAR
+    if (step === 'spo2') {
+      const val = _state.bpSpo2 ?? 98;
+      return _taskArea(`
+        <div class="p-halo rose">${Icons.get('heart', 120, ICON_COL.vital, 2.5)}</div>
+        <div class="p-bp-label">
+          <div class="p-bp-label-main">Oxígeno en sangre</div>
+          <div class="p-bp-label-sub">(SpO₂ — si tenés el oxímetro)</div>
+        </div>
+        <div class="p-bp-stepper">
+          <button class="p-bp-step-btn" data-action="bpAdj" data-delta="-1">${Icons.get('minus', 44, '#fff', 3.2)}</button>
+          <div class="p-bp-value" id="bp-value-display">${val}</div>
+          <button class="p-bp-step-btn" data-action="bpAdj" data-delta="1">${Icons.get('plus', 44, '#fff', 3.2)}</button>
+        </div>
+        <div class="p-bp-jumps">
+          ${[-2,-1,+1,+2].map(d =>
+            `<button class="p-bp-jump" data-action="bpAdj" data-delta="${d}">${d > 0 ? '+' + d : d}</button>`
+          ).join('')}
+        </div>
+        ${_replayBtn(`El oxígeno es ${val} por ciento.`)}
+        <button class="p-listo primary" data-action="bpNext">
+          ${Icons.get('arrow-right', 42, '#fff', 3)} SIGUIENTE
+        </button>
+        <button class="p-bp-redo" data-action="bpSpo2Skip">No tengo oxímetro — Saltar</button>
+      `);
+    }
     // confirm
+    const spo2Line = _state.bpSpo2 != null
+      ? `<p class="p-bp-confirm" style="margin-top:6px">SpO₂: <strong>${_state.bpSpo2}%</strong></p>`
+      : '';
+    const confirmSpeech = `Tu presión es ${_state.bpSys} sobre ${_state.bpDia}. Pulso ${_state.bpPul}${_state.bpSpo2 != null ? `. Oxígeno ${_state.bpSpo2} por ciento` : ''}.`;
     return _taskArea(`
       <div class="p-halo rose" style="width:180px;height:180px">${Icons.get('heart', 100, ICON_COL.vital, 2.5)}</div>
       <div style="text-align:center">
         <p class="p-bp-confirm">Tu presión es</p>
         <div class="p-bp-result">${_state.bpSys}/${_state.bpDia}</div>
         <p class="p-bp-confirm" style="margin-top:10px">Pulso: <strong>${_state.bpPul}</strong> lpm</p>
+        ${spo2Line}
       </div>
-      ${_replayBtn(`Tu presión es ${_state.bpSys} sobre ${_state.bpDia}. Pulso ${_state.bpPul}.`)}
+      ${_replayBtn(confirmSpeech)}
       <button class="p-bp-redo" data-action="bpRedo">Volver a escribir</button>
       ${_listoBtn('GUARDAR')}
     `);
@@ -512,6 +551,7 @@ const Patient = (() => {
           _state.bpSys  = 130;
           _state.bpDia  = 80;
           _state.bpPul  = 70;
+          _state.bpSpo2 = null;
           if (_state.taskIdx < slots.length - 1) _state.taskIdx++;
           render();
           break;
@@ -547,6 +587,10 @@ const Patient = (() => {
           _state.bpStep = 'pul';
           if (_state.voiceEnabled) TTS.speak('Ahora el pulso.');
         } else if (_state.bpStep === 'pul') {
+          _state.bpStep = 'spo2';
+          _state.bpSpo2 = 98;
+          if (_state.voiceEnabled) TTS.speak('Si tenés el oxímetro, ponételo ahora.');
+        } else if (_state.bpStep === 'spo2') {
           _state.bpStep = 'confirm';
           if (_state.voiceEnabled) TTS.speak(`Tu presión es ${_state.bpSys} sobre ${_state.bpDia}. Pulso ${_state.bpPul}. ¿Está bien?`);
         }
@@ -555,20 +599,28 @@ const Patient = (() => {
 
       case 'bpAdj': {
         const delta = parseInt(el.dataset.delta, 10);
-        if (_state.bpStep === 'sys') _state.bpSys = Math.max(40,  Math.min(260, _state.bpSys + delta));
-        if (_state.bpStep === 'dia') _state.bpDia = Math.max(30,  Math.min(180, _state.bpDia + delta));
-        if (_state.bpStep === 'pul') _state.bpPul = Math.max(30,  Math.min(200, _state.bpPul + delta));
+        if (_state.bpStep === 'sys')  _state.bpSys  = Math.max(40,  Math.min(260, _state.bpSys  + delta));
+        if (_state.bpStep === 'dia')  _state.bpDia  = Math.max(30,  Math.min(180, _state.bpDia  + delta));
+        if (_state.bpStep === 'pul')  _state.bpPul  = Math.max(30,  Math.min(200, _state.bpPul  + delta));
+        if (_state.bpStep === 'spo2') _state.bpSpo2 = Math.max(70,  Math.min(100, (_state.bpSpo2 ?? 98) + delta));
         const display = document.getElementById('bp-value-display');
         if (display) {
-          if (_state.bpStep === 'sys') display.textContent = _state.bpSys;
-          if (_state.bpStep === 'dia') display.textContent = _state.bpDia;
-          if (_state.bpStep === 'pul') display.textContent = _state.bpPul;
+          if (_state.bpStep === 'sys')  display.textContent = _state.bpSys;
+          if (_state.bpStep === 'dia')  display.textContent = _state.bpDia;
+          if (_state.bpStep === 'pul')  display.textContent = _state.bpPul;
+          if (_state.bpStep === 'spo2') display.textContent = _state.bpSpo2;
         }
         break;
       }
 
       case 'bpRedo':
         _state.bpStep = 'sys';
+        render();
+        break;
+
+      case 'bpSpo2Skip':
+        _state.bpSpo2 = null;
+        _state.bpStep = 'confirm';
         render();
         break;
 
@@ -590,9 +642,11 @@ const Patient = (() => {
         const slot  = slots[_state.taskIdx];
         // Save BP before hanging up if on confirm step
         if (slot?.type === 'vital' && _state.bpStep === 'confirm') {
-          Protocol.saveVital(slot.id, 'sys', _state.bpSys);
-          Protocol.saveVital(slot.id, 'dia', _state.bpDia);
-          Protocol.saveVital(slot.id, 'pul', _state.bpPul);
+          Protocol.saveVital(slot.id, 'sys',  _state.bpSys);
+          Protocol.saveVital(slot.id, 'dia',  _state.bpDia);
+          Protocol.saveVital(slot.id, 'pul',  _state.bpPul);
+          if (_state.bpSpo2 != null)
+            Protocol.saveVital(slot.id, 'spo2', _state.bpSpo2);
         }
         _closeSOS();
         if (_state.voiceEnabled) TTS.speak(`Llamando a ${el.dataset.name}.`);
@@ -608,9 +662,11 @@ const Patient = (() => {
     const slots = _todaySlots();
     const slot  = slots[_state.taskIdx];
     if (slot?.type === 'vital' && _state.bpStep === 'confirm') {
-      Protocol.saveVital(slot.id, 'sys', _state.bpSys);
-      Protocol.saveVital(slot.id, 'dia', _state.bpDia);
-      Protocol.saveVital(slot.id, 'pul', _state.bpPul);
+      Protocol.saveVital(slot.id, 'sys',  _state.bpSys);
+      Protocol.saveVital(slot.id, 'dia',  _state.bpDia);
+      Protocol.saveVital(slot.id, 'pul',  _state.bpPul);
+      if (_state.bpSpo2 != null)
+        Protocol.saveVital(slot.id, 'spo2', _state.bpSpo2);
     }
   }, true);
 
