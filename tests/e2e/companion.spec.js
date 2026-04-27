@@ -453,19 +453,37 @@ test.describe('Index — selector de modo', () => {
 
   test('marcar recordar + elegir modo guarda en localStorage', async ({ page }) => {
     await page.check('#remember');
-    // Abortar la navegación para quedarnos en index.html y poder leer localStorage.
-    // El click handler llama setItem ANTES de location.href, así que el valor ya está.
-    await page.route('**/patient.html', route => route.abort());
-    await page.click('.mode-tile.patient').catch(() => {});
-    const value = await page.evaluate(() => localStorage.getItem('nc_user_type'));
-    expect(value).toBe('patient');
+    await page.route('**/patient.html', route =>
+      route.fulfill({ status: 200, contentType: 'text/html', body: '<html><body></body></html>' })
+    );
+    // Interceptamos localStorage.setItem y disparamos el click dentro del mismo
+    // page.evaluate — la Promise resuelve sincrónicamente en el handler, antes
+    // de que location.href destruya el contexto.
+    const captured = await page.evaluate(() => new Promise(resolve => {
+      const orig = localStorage.setItem.bind(localStorage);
+      localStorage.setItem = (k, v) => {
+        orig(k, v);
+        if (k === 'nc_user_type') { localStorage.setItem = orig; resolve({ k, v }); }
+      };
+      document.querySelector('.mode-tile.patient').click();
+    }));
+    expect(captured.k).toBe('nc_user_type');
+    expect(captured.v).toBe('patient');
   });
 
   test('sin marcar recordar no persiste en localStorage', async ({ page }) => {
-    // Sin remember, el handler llama removeItem — nc_user_type no debe estar en storage.
-    await page.route('**/caregiver.html', route => route.abort());
-    await page.click('.mode-tile.caregiver').catch(() => {});
-    const value = await page.evaluate(() => localStorage.getItem('nc_user_type'));
-    expect(value).toBeNull();
+    await page.route('**/caregiver.html', route =>
+      route.fulfill({ status: 200, contentType: 'text/html', body: '<html><body></body></html>' })
+    );
+    // Sin remember, el handler llama removeItem (no setItem) — verificamos
+    // que nc_user_type nunca sea guardado, todo dentro del mismo contexto.
+    const ncWasSet = await page.evaluate(() => new Promise(resolve => {
+      let set = false;
+      const orig = localStorage.setItem.bind(localStorage);
+      localStorage.setItem = (k, v) => { orig(k, v); if (k === 'nc_user_type') set = true; };
+      document.querySelector('.mode-tile.caregiver').click();
+      resolve(set); // sincrónico: el handler ya corrió
+    }));
+    expect(ncWasSet).toBe(false);
   });
 });
