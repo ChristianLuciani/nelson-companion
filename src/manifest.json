@@ -4,8 +4,8 @@
   "description": "Acompañante médico diario de Nelson Luciani",
   "start_url": ".",
   "display": "standalone",
-  "background_color": "#ffffff",
-  "theme_color": "#1B4F72",
+  "background_color": "#f4ede2",
+  "theme_color": "#c97456",
   "orientation": "portrait",
   "icons": [
     { "src": "assets/web-app-manifest-192x192.png", "sizes": "192x192", "type": "image/png", "purpose": "maskable" },

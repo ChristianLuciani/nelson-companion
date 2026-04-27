@@ -5,41 +5,39 @@
   <meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=no"/>
   <meta name="apple-mobile-web-app-capable" content="yes"/>
   <meta name="apple-mobile-web-app-status-bar-style" content="default"/>
-  <meta name="theme-color" content="#1B4F72"/>
-  <link rel="icon" type="image/png" href="favicon-96x96.png" sizes="96x96" />
-  <link rel="icon" type="image/svg+xml" href="favicon.svg" />
-  <link rel="shortcut icon" href="favicon.ico" />
-  <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png" />
+  <meta name="theme-color" content="#c97456"/>
+  <link rel="icon" type="image/png" href="favicon-96x96.png" sizes="96x96"/>
+  <link rel="icon" type="image/svg+xml" href="favicon.svg"/>
+  <link rel="shortcut icon" href="favicon.ico"/>
+  <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png"/>
   <link rel="manifest" href="manifest.json"/>
   <title>Nelson — Cuidador</title>
+  <script>(function(){var t=localStorage.getItem('nc_theme');if(!t){var h=new Date().getHours();t=(h>=21||h<7)?'high-contrast':'warm';}document.documentElement.dataset.theme=t;})()</script>
+  <link rel="stylesheet" href="css/theme.css"/>
   <link rel="stylesheet" href="css/styles.css"/>
 </head>
 <body data-user-type="caregiver">
   <div id="app">
-    <div style="padding:2rem;text-align:center;color:#888;font-family:sans-serif">
-      Cargando...
-    </div>
+    <div style="padding:2rem;text-align:center;color:var(--muted);font-family:var(--font-body)">Cargando…</div>
   </div>
-  <a href="index.html?switch" class="switch-mode-link"
-     style="position:fixed;bottom:8px;right:8px;font-size:11px;color:#888;background:rgba(255,255,255,.85);padding:4px 8px;border-radius:6px;text-decoration:none;border:0.5px solid #DDD;font-family:sans-serif;z-index:100">
-    ↻ cambiar modo
-  </a>
 
-  <!-- Supabase (opcional — si no está configurado, opera en modo offline) -->
+  <!-- Supabase (opcional — opera offline si no está configurado) -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
 
-  <!--
-    Configuración de servicios externos.
-    Para desarrollo local: crear src/env.js con tus keys (está en .gitignore)
-    Para producción: inyectar via GitHub Actions secrets
-  -->
+  <!-- Configuración (env.js en .gitignore — opcional) -->
   <script src="env.js" onerror="console.info('env.js no encontrado — modo offline')"></script>
 
-  <!-- Módulos de la app (orden importa) -->
+  <!-- Íconos SVG inline -->
+  <script src="js/icons.js"></script>
+
+  <!-- Módulos compartidos -->
   <script src="js/tts.js"></script>
   <script src="js/supabase.js"></script>
   <script src="js/db.js"></script>
   <script src="js/protocol.js"></script>
+
+  <!-- Controlador del cuidador -->
   <script src="js/app.js"></script>
+  <script src="js/sw-register.js"></script>
 </body>
 </html>
