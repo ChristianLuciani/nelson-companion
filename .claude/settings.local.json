@@ -1,0 +1,32 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(git checkout *)",
+      "Bash(npm test *)",
+      "Bash(xargs ls *)",
+      "Bash(git add *)",
+      "Bash(git commit -m ' *)",
+      "Bash(curl -s \"https://realfavicongenerator.net/files/662fa49c-3c5d-4d2e-9f16-428d87cfc8ea/favicon.svg\" -o /Users/eva/PROJECTOS/GitHub/ChristianLuciani/nelson-companion/src/favicon.svg)",
+      "Bash(curl -s \"https://realfavicongenerator.net/files/662fa49c-3c5d-4d2e-9f16-428d87cfc8ea/favicon-96x96.png\" -o /Users/eva/PROJECTOS/GitHub/ChristianLuciani/nelson-companion/src/favicon-96x96.png)",
+      "Bash(curl -s \"https://realfavicongenerator.net/files/662fa49c-3c5d-4d2e-9f16-428d87cfc8ea/favicon.ico\" -o /Users/eva/PROJECTOS/GitHub/ChristianLuciani/nelson-companion/src/favicon.ico)",
+      "Bash(curl -s \"https://realfavicongenerator.net/files/662fa49c-3c5d-4d2e-9f16-428d87cfc8ea/apple-touch-icon.png\" -o /Users/eva/PROJECTOS/GitHub/ChristianLuciani/nelson-companion/src/apple-touch-icon.png)",
+      "Bash(curl -s \"https://realfavicongenerator.net/files/662fa49c-3c5d-4d2e-9f16-428d87cfc8ea/web-app-manifest-192x192.png\" -o /Users/eva/PROJECTOS/GitHub/ChristianLuciani/nelson-companion/src/assets/web-app-manifest-192x192.png)",
+      "mcp__73c57f38-700e-4293-b2b1-a01f426cd798__list_projects",
+      "mcp__73c57f38-700e-4293-b2b1-a01f426cd798__get_project",
+      "mcp__73c57f38-700e-4293-b2b1-a01f426cd798__list_organizations",
+      "mcp__73c57f38-700e-4293-b2b1-a01f426cd798__list_tables",
+      "mcp__73c57f38-700e-4293-b2b1-a01f426cd798__get_publishable_keys",
+      "mcp__73c57f38-700e-4293-b2b1-a01f426cd798__execute_sql",
+      "Bash(git fetch *)",
+      "Bash(gh issue *)",
+      "Bash(npx jest *)",
+      "Bash(npx serve *)",
+      "Bash(npx playwright *)",
+      "Bash(lsof -ti:3000)",
+      "Bash(node -e ' *)",
+      "Bash(curl -s https://api.elevenlabs.io/v1/voices -H 'xi-api-key: sk_ac3d3528d0a1bd7ad160199da456255042eb7dbc9fafb8ef')",
+      "Bash(node -e \"console.log\\(JSON.stringify\\(require\\('./package.json'\\).scripts, null, 2\\)\\)\")",
+      "Bash(npm run *)"
+    ]
+  }
+}

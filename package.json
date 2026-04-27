@@ -10,7 +10,10 @@
     "test:e2e": "playwright test tests/e2e/",
     "test:watch": "jest --watch",
     "lint": "eslint src/js/",
-    "build": "echo 'No build step required — static app'"
+    "build": "echo 'No build step required — static app'",
+    "generate:audio": "infisical run --env=dev -- node scripts/generate-audio.js",
+    "generate:audio:dry": "node scripts/generate-audio.js --dry-run",
+    "generate:audio:force": "infisical run --env=dev -- node scripts/generate-audio.js --force"
   },
   "devDependencies": {
     "jest": "^29.0.0",

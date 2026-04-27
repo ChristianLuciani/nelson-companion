@@ -100,3 +100,43 @@ async function networkFirstWithCache(req) {
     return caches.match(req);
   }
 }
+
+// ── PUSH: mostrar notificación del SO ─────────────────────────────
+self.addEventListener('push', event => {
+  let data = { title: 'Nelson Companion', body: 'Es hora de tomar tu medicación.' };
+  try {
+    if (event.data) data = event.data.json();
+  } catch (_) {}
+
+  const options = {
+    body:    data.body,
+    icon:    './assets/web-app-manifest-192x192.png',
+    badge:   './favicon-96x96.png',
+    tag:     data.tag || 'nelson-reminder',
+    renotify: true,
+    requireInteraction: true,
+    data:    { url: data.url || './patient.html' },
+  };
+
+  event.waitUntil(
+    self.registration.showNotification(data.title, options)
+  );
+});
+
+// ── NOTIFICATION CLICK: abrir/enfocar patient.html ────────────────
+self.addEventListener('notificationclick', event => {
+  event.notification.close();
+  const target = event.notification.data?.url || './patient.html';
+
+  event.waitUntil(
+    self.clients.matchAll({ type: 'window', includeUncontrolled: true })
+      .then(clients => {
+        for (const client of clients) {
+          if (client.url.includes('patient.html') && 'focus' in client) {
+            return client.focus();
+          }
+        }
+        return self.clients.openWindow(target);
+      })
+  );
+});

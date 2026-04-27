@@ -421,6 +421,12 @@ html, body {
 }
 .cg-theme-dot:hover { transform: scale(1.15); }
 
+/* ── Toast animation ─────────────────────────────────────────── */
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateX(-50%) translateY(8px); }
+  to   { opacity: 1; transform: translateX(-50%) translateY(0); }
+}
+
 /* ── Mobile ──────────────────────────────────────────────────── */
 @media (max-width: 768px) {
   .cg-layout { grid-template-columns: 1fr; }
@@ -435,4 +441,28 @@ html, body {
   .kpi-grid { grid-template-columns: repeat(2,1fr); }
   .grid-main-side, .grid-12, .grid-14, .grid-1-320 { grid-template-columns: 1fr; }
   .contact-grid { grid-template-columns: 1fr; }
+}
+
+/* ── Print ───────────────────────────────────────────────────── */
+@media print {
+  * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+
+  .cg-sidebar, .cg-voice-banner, .cg-header-btns,
+  .cg-export-btn, .cg-switch-link, .cg-theme-row,
+  #nc-toast { display: none !important; }
+
+  .cg-layout { display: block; }
+  .cg-main   { padding: 0; gap: 12px; }
+
+  .card { break-inside: avoid; box-shadow: none; border: 1px solid #ccc; }
+
+  .stop-rule.red    { background: #fef2f2 !important; }
+  .stop-rule.orange { background: #fffbeb !important; }
+
+  body::before {
+    content: "Nelson Luciani — Registro médico — " attr(data-print-date);
+    display: block; font-size: 11px; color: #666;
+    margin-bottom: 12px; padding-bottom: 8px;
+    border-bottom: 1px solid #ccc;
+  }
 }

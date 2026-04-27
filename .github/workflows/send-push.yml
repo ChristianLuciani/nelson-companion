@@ -1,0 +1,82 @@
+name: Send medication push notifications
+
+on:
+  # Run at each medication time (Panama time = UTC-5)
+  # Protocol slots: 08:00, 12:00, 16:00, 20:00 Panama → UTC 13, 17, 21, 01
+  schedule:
+    - cron: '0 13 * 4-5 *'   # 08:00 Panama — mañana
+    - cron: '0 17 * 4-5 *'   # 12:00 Panama — mediodía
+    - cron: '0 21 * 4-5 *'   # 16:00 Panama — tarde
+    - cron: '0  1 * 4-5 *'   # 20:00 Panama — noche
+
+  workflow_dispatch:
+    inputs:
+      slot_time:
+        description: 'Hora del slot (HH:MM)'
+        required: false
+        default: ''
+      message_override:
+        description: 'Mensaje personalizado (opcional)'
+        required: false
+        default: ''
+
+jobs:
+  push:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Inject secrets from Infisical
+        uses: Infisical/secrets-action@v1.0.7
+        with:
+          client-id: ${{ secrets.INFISICAL_CLIENT_ID }}
+          client-secret: ${{ secrets.INFISICAL_CLIENT_SECRET }}
+          env-slug: "production"
+          project-id: "2a182da9-5baf-4b8a-81b0-f8bd009a6a97"
+          secret-path: "/"
+          export-type: env
+
+      - name: Determine slot and message
+        id: slot
+        run: |
+          HOUR=$(date -u +%H)
+          case "$HOUR" in
+            13) SLOT_TIME="08:00" ; MSG="Medicación matutina: Aspirina, Clopidogrel y Nebivolol" ;;
+            17) SLOT_TIME="12:00" ; MSG="Medicación del mediodía: Simvastatina y Omeprazol" ;;
+            21) SLOT_TIME="16:00" ; MSG="Revisión de presión arterial de la tarde" ;;
+             1) SLOT_TIME="20:00" ; MSG="Medicación nocturna y presión arterial" ;;
+             *) SLOT_TIME="${{ inputs.slot_time }}" ; MSG="Recordatorio de medicación" ;;
+          esac
+
+          if [ -n "${{ inputs.message_override }}" ]; then
+            MSG="${{ inputs.message_override }}"
+          fi
+
+          TODAY=$(date -u +%Y%m%d)
+          SLOT_ID="${TODAY}_${SLOT_TIME/:/}"
+
+          echo "slot_time=$SLOT_TIME"   >> $GITHUB_OUTPUT
+          echo "slot_id=$SLOT_ID"       >> $GITHUB_OUTPUT
+          echo "message=$MSG"           >> $GITHUB_OUTPUT
+
+      - name: Send push via Supabase Edge Function
+        run: |
+          RESPONSE=$(curl -s -w "\n%{http_code}" \
+            -X POST "$SUPABASE_URL/functions/v1/send-push" \
+            -H "Authorization: Bearer $SUPABASE_SERVICE_ROLE_KEY" \
+            -H "Content-Type: application/json" \
+            -d '{
+              "slotId": "${{ steps.slot.outputs.slot_id }}",
+              "title": "Nelson — ${{ steps.slot.outputs.slot_time }}",
+              "body":  "${{ steps.slot.outputs.message }}",
+              "url":   "./patient.html"
+            }')
+
+          HTTP_CODE=$(echo "$RESPONSE" | tail -n1)
+          BODY=$(echo "$RESPONSE" | head -n-1)
+
+          echo "Status: $HTTP_CODE"
+          echo "Response: $BODY"
+
+          if [ "$HTTP_CODE" != "200" ]; then
+            echo "Error sending push notification"
+            exit 1
+          fi

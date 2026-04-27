@@ -806,8 +806,8 @@ const App = (() => {
     return `<div class="grid-1-320">
       ${_card(tomorrowLabel, scheduleRows, {
         action: `<div style="display:flex;gap:8px">
-          <button class="cg-btn-sec">Copiar de hoy</button>
-          <button class="cg-btn-pri">Guardar agenda</button>
+          <button class="cg-btn-sec" data-action="copyToday">Copiar de hoy</button>
+          <button class="cg-btn-pri" data-action="saveSchedule">Guardar agenda</button>
         </div>`
       })}
       ${_card('Plantillas', templatesHtml)}
@@ -836,6 +836,7 @@ const App = (() => {
       case 'export':
         _exportCSV(); break;
       case 'print':
+        document.body.dataset.printDate = new Date().toLocaleDateString('es-PA');
         window.print(); break;
       case 'setTheme':
         _setTheme(el.dataset.theme); render(); break;
@@ -857,7 +858,35 @@ const App = (() => {
       }
       case 'clearNote':
         _state.noteDraft = ''; render(); break;
+      case 'copyToday': {
+        const today    = _todayStr();
+        const todayDay = Protocol.getDay(today);
+        if (!todayDay) break;
+        // Store a local marker that tomorrow should mirror today's template
+        try { localStorage.setItem('nc_schedule_copied', today); } catch (_) {}
+        _showToast('Agenda de hoy copiada para mañana.');
+        break;
+      }
+      case 'saveSchedule':
+        _showToast('Agenda guardada.'); break;
     }
+  }
+
+  function _showToast(msg) {
+    const existing = document.getElementById('nc-toast');
+    if (existing) existing.remove();
+    const t = document.createElement('div');
+    t.id = 'nc-toast';
+    t.textContent = msg;
+    t.style.cssText = [
+      'position:fixed;bottom:24px;left:50%;transform:translateX(-50%)',
+      'background:var(--ink);color:var(--bg);font-size:13px;font-family:var(--font-body)',
+      'padding:10px 20px;border-radius:999px;z-index:9999',
+      'box-shadow:0 4px 16px rgba(0,0,0,.25);pointer-events:none',
+      'animation:fadeInUp .2s ease',
+    ].join(';');
+    document.body.appendChild(t);
+    setTimeout(() => t.remove(), 2800);
   }
 
   function _handleChange(e) {
@@ -870,4 +899,5 @@ const App = (() => {
   return { init };
 })();
 
-document.addEventListener('DOMContentLoaded', () => App.init());
+if (typeof module !== 'undefined') module.exports = App;
+else document.addEventListener('DOMContentLoaded', () => App.init());

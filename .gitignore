@@ -5,6 +5,8 @@ dist/
 coverage/
 playwright-report/
 test-results/
+# Claude Code worktrees (no commitear — son directorios git temporales)
+.claude/worktrees/
 # Keys locales — NUNCA commitear
 src/env.js
 .env

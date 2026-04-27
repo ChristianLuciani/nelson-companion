@@ -1,0 +1,64 @@
+name: Deploy to GitHub Pages
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Inject secrets from Infisical
+        uses: Infisical/secrets-action@v1.0.7
+        with:
+          client-id: ${{ secrets.INFISICAL_CLIENT_ID }}
+          client-secret: ${{ secrets.INFISICAL_CLIENT_SECRET }}
+          env-slug: "production"
+          project-id: "2a182da9-5baf-4b8a-81b0-f8bd009a6a97"
+          secret-path: "/"
+          export-type: env
+
+      - name: Generate env.js from Infisical secrets
+        run: |
+          cat > src/env.js << EOF
+          window.SUPABASE_CONFIG = {
+            url: '$SUPABASE_URL',
+            publishableKey: '$SUPABASE_PUBLISHABLE_KEY'
+          };
+          window.TTS_CONFIG = {
+            apiProvider: 'elevenlabs',
+            apiKey: '$ELEVENLABS_API_KEY',
+            voiceId: 'VR6AewLTigWG4xSOukaG'
+          };
+          window.PUSH_CONFIG = {
+            vapidPublicKey: '$VAPID_PUBLIC_KEY'
+          };
+          EOF
+
+      - name: Setup Pages
+        uses: actions/configure-pages@v4
+
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: src/
+
+      - id: deployment
+        name: Deploy to GitHub Pages
+        uses: actions/deploy-pages@v4
