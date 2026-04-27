@@ -26,7 +26,20 @@
       "Bash(node -e ' *)",
       "Bash(curl -s https://api.elevenlabs.io/v1/voices -H 'xi-api-key: sk_ac3d3528d0a1bd7ad160199da456255042eb7dbc9fafb8ef')",
       "Bash(node -e \"console.log\\(JSON.stringify\\(require\\('./package.json'\\).scripts, null, 2\\)\\)\")",
-      "Bash(npm run *)"
+      "Bash(npm run *)",
+      "Bash(git commit -m 'docs: README reescrito con deploy, Infisical y instrucciones de usuario *)",
+      "Bash(git ls-tree *)",
+      "Bash(git push *)",
+      "Bash(gh run *)",
+      "Bash(gh api *)",
+      "Bash(gh pr *)",
+      "Bash(infisical secrets *)",
+      "Bash(python3 -c \"import sys,json; d=json.load\\(sys.stdin\\); print\\(json.dumps\\(d,indent=2\\)\\)\")",
+      "Bash(infisical user *)",
+      "Read(//Users/eva/.infisical/**)",
+      "Bash(infisical run *)",
+      "Bash(infisical export *)",
+      "Bash(python3 -c ' *)"
     ]
   }
 }
