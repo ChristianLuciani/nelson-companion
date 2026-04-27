@@ -4,7 +4,7 @@ Este documento lista lo que **Christian (el humano)** debe hacer para que la app
 100% operativa. Está separado del README porque son acciones one-off de configuración
 (claves, instalación física, validación), no parte del uso diario.
 
-**Última actualización**: rama `user-type` después del segundo commit de alarmas.
+**Última actualización**: 2026-04-27 — plan de 6 fases aprobado, Fase 1 en ejecución. Audio generado con ElevenLabs (77 MP3, voz Valentina) — no usar Revoicer.
 
 ---
 
