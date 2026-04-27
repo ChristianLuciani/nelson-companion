@@ -320,15 +320,24 @@ Cualquier cambio en estos umbrales requiere validación médica documentada en u
 
 ## Issues y features activos
 
-Ver `docs/ROADMAP.md` para el plan completo.
+Ver `docs/ROADMAP.md` para el plan completo de 6 fases.
+Ver `docs/DESIGN_SYSTEM.md` para tipografía (Lexend), paleta y motivación.
+Ver `docs/ARCHITECTURE.md` para estructura de módulos actualizada.
+Ver `specs/SPEC_companion.md` para especificaciones funcionales y BDD.
 
-Próximas tareas inmediatas:
-1. `feat: crear src/js/supabase.js` — cliente singleton con fallback a localStorage
-2. `feat: crear src/js/db.js` — módulo de persistencia offline-first
-3. `feat: actualizar protocol.js` para usar DB.js en lugar de localStorage directo
-4. `test: unit tests para db.js` con Supabase mock
-5. `feat: Supabase Storage para pill photos` reemplazando base64 en localStorage
-6. `feat: service worker` para offline completo
+### Estado actual (27 abril 2026)
+- `supabase.js`, `db.js`, `push.js`, `sw.js` ya implementados ✅
+- Audio pregrabado: 77 MP3 generados con ElevenLabs voz Valentina ✅
+- Issue #17 (audio pregrabado no suena): en scope Fase 1–2
+- Issue #18 (tarjeta automática por hora): Fase 1 en ejecución
+
+### Próximas tareas — Fase 1 en ejecución
+1. `fix: ordenar slots por time en Protocol.load` (bug en 2026-04-25)
+2. `feat: Protocol.getRituals(dateStr)` — agrupación por hora
+3. `feat: getCurrentRitual / getCurrentStep / getNextRitual en patient.js`
+4. `refactor: eliminar _state.taskIdx y _state.showDone`
+5. `refactor: render() con tres ramas (pre-amanecer / acción / reposo)`
+6. `test: rituals.test.js + patient-clock.test.js + auto-advance.spec.js`
 
 ---
 
