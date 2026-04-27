@@ -33,16 +33,33 @@ const TTS = (() => {
       if (slotId) {
         const audioUrl = `assets/audio/${slotId}.mp3`;
         const audio = new Audio(audioUrl);
+        let fallbackUsed = false;
+
         audio.onended = () => {
           _isSpeaking = false;
           if (_speakEndCallback) _speakEndCallback();
         };
         audio.onerror = () => {
           // Fallback a navegador
-          _speakWithBrowser(text);
+          if (!fallbackUsed) {
+            fallbackUsed = true;
+            _isSpeaking = false;
+            _speakWithBrowser(text);
+          }
         };
-        audio.play();
-        return;
+
+        try {
+          await audio.play();
+          return;
+        } catch (e) {
+          // Promise rechazada — fallback a navegador
+          if (!fallbackUsed) {
+            fallbackUsed = true;
+            _isSpeaking = false;
+            _speakWithBrowser(text);
+          }
+          return;
+        }
       }
     } catch (_) {}
 
