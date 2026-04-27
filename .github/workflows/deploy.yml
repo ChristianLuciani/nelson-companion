@@ -31,7 +31,7 @@ jobs:
           client-id: ${{ secrets.INFISICAL_CLIENT_ID }}
           client-secret: ${{ secrets.INFISICAL_CLIENT_SECRET }}
           project-slug: "nelson-companion-ea-mt"
-          env-slug: "production"
+          env-slug: "dev"
           secret-path: "/"
           export-type: env
 
