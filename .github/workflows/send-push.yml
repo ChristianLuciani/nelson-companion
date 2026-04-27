@@ -27,10 +27,11 @@ jobs:
       - name: Inject secrets from Infisical
         uses: Infisical/secrets-action@v1.0.7
         with:
+          method: universal-auth
           client-id: ${{ secrets.INFISICAL_CLIENT_ID }}
           client-secret: ${{ secrets.INFISICAL_CLIENT_SECRET }}
+          project-slug: "nelson-companion-ea-mt"
           env-slug: "production"
-          project-id: "2a182da9-5baf-4b8a-81b0-f8bd009a6a97"
           secret-path: "/"
           export-type: env
 
