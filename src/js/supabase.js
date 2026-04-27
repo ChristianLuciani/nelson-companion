@@ -13,13 +13,14 @@ const SupabaseClient = (() => {
 
   function init() {
     const cfg = window.SUPABASE_CONFIG;
-    if (!cfg?.url || !cfg?.anonKey) {
+    // Soporta publishableKey (nuevo protocolo sb_publishable_*) y anonKey (legacy)
+    const key = cfg?.publishableKey || cfg?.anonKey;
+    if (!cfg?.url || !key) {
       console.info('[Supabase] No configurado — operando en modo offline');
       return;
     }
-    // Cargar cliente Supabase desde CDN si no está disponible
     if (window.supabase?.createClient) {
-      _client = window.supabase.createClient(cfg.url, cfg.anonKey);
+      _client = window.supabase.createClient(cfg.url, key);
       _ready  = true;
       console.info('[Supabase] Conectado a', cfg.url);
     } else {

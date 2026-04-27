@@ -9,7 +9,6 @@ on:
     - cron: '0 21 * 4-5 *'   # 16:00 Panama — tarde
     - cron: '0  1 * 4-5 *'   # 20:00 Panama — noche
 
-  # Allow manual trigger with custom slot
   workflow_dispatch:
     inputs:
       slot_time:
@@ -25,10 +24,19 @@ jobs:
   push:
     runs-on: ubuntu-latest
     steps:
+      - name: Inject secrets from Infisical
+        uses: Infisical/secrets-action@v1.0.7
+        with:
+          client-id: ${{ secrets.INFISICAL_CLIENT_ID }}
+          client-secret: ${{ secrets.INFISICAL_CLIENT_SECRET }}
+          env-slug: "production"
+          project-id: "2a182da9-5baf-4b8a-81b0-f8bd009a6a97"
+          secret-path: "/"
+          export-type: env
+
       - name: Determine slot and message
         id: slot
         run: |
-          # Map current UTC hour to Panama slot
           HOUR=$(date -u +%H)
           case "$HOUR" in
             13) SLOT_TIME="08:00" ; MSG="Medicación matutina: Aspirina, Clopidogrel y Nebivolol" ;;
@@ -38,7 +46,6 @@ jobs:
              *) SLOT_TIME="${{ inputs.slot_time }}" ; MSG="Recordatorio de medicación" ;;
           esac
 
-          # Override with manual input if provided
           if [ -n "${{ inputs.message_override }}" ]; then
             MSG="${{ inputs.message_override }}"
           fi
@@ -53,8 +60,8 @@ jobs:
       - name: Send push via Supabase Edge Function
         run: |
           RESPONSE=$(curl -s -w "\n%{http_code}" \
-            -X POST "${{ secrets.SUPABASE_URL }}/functions/v1/send-push" \
-            -H "Authorization: Bearer ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}" \
+            -X POST "$SUPABASE_URL/functions/v1/send-push" \
+            -H "Authorization: Bearer $SUPABASE_SERVICE_ROLE_KEY" \
             -H "Content-Type: application/json" \
             -d '{
               "slotId": "${{ steps.slot.outputs.slot_id }}",

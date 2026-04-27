@@ -1,15 +1,19 @@
 /**
- * env.example.js — Copiar como env.js y completar con tus keys
- * env.js está en .gitignore — nunca commitear keys reales
+ * env.example.js — Plantilla de configuración local
+ *
+ * Copiá este archivo como src/env.js y completá con tus valores.
+ * src/env.js está en .gitignore — nunca commitear keys reales.
+ *
+ * En producción GitHub Actions inyecta estas variables desde Infisical
+ * durante el deploy (ver .github/workflows/deploy.yml).
  */
 window.SUPABASE_CONFIG = {
-  url: 'https://vvqpknduifkkfywpiwkn.supabase.co',
-  anonKey: '[TU-ANON-KEY]'  // Dashboard → Project Settings → API → anon public
+  url: 'https://[PROJECT-REF].supabase.co',
+  publishableKey: 'sb_publishable_[TU-PUBLISHABLE-KEY]'  // Dashboard → Project Settings → API → Publishable key
 };
 
-// Opcional — para TTS de alta calidad
 window.TTS_CONFIG = {
   apiProvider: 'elevenlabs',   // 'elevenlabs' | 'openai' | null
-  apiKey: '[TU-API-KEY]',
-  voiceId: '[TU-VOICE-ID]'     // ElevenLabs voice ID en español
+  apiKey: '[TU-ELEVENLABS-API-KEY]',
+  voiceId: 'VR6AewLTigWG4xSOukaG'  // Valentina (built-in, free tier)
 };

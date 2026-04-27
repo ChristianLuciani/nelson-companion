@@ -249,22 +249,41 @@ git push origin main
 
 ---
 
-## Variables de entorno
+## Variables de entorno y secrets
 
-Para desarrollo local, crear `src/env.js` (en .gitignore):
+### Gestión de secrets — Infisical
+Todos los secrets están centralizados en **Infisical** (project ID: `2a182da9-5baf-4b8a-81b0-f8bd009a6a97`).
+
+```bash
+# Setup inicial (una vez por máquina)
+brew install infisical/get-cli/infisical
+infisical login
+
+# Correr scripts con secrets inyectados automáticamente
+npm run generate:audio          # infisical run --env=dev -- node scripts/generate-audio.js
+```
+
+Secrets en Infisical:
+- `SUPABASE_URL` — URL del proyecto Supabase
+- `SUPABASE_PUBLISHABLE_KEY` — Clave pública (sb_publishable_*), reemplaza anon key
+- `SUPABASE_SERVICE_ROLE_KEY` — Solo para Edge Functions / GitHub Actions
+- `ELEVENLABS_API_KEY` — Para regenerar audios
+- `VAPID_PUBLIC_KEY`, `VAPID_PRIVATE_KEY` — Push notifications
+
+### Desarrollo local
+Copiar `src/env.example.js` como `src/env.js` y completar con los valores de Infisical:
 ```js
 window.SUPABASE_CONFIG = {
   url: 'https://[PROJECT].supabase.co',
-  anonKey: '[ANON_KEY]'
-};
-window.TTS_CONFIG = {
-  apiProvider: 'elevenlabs',   // o 'openai'
-  apiKey: '[API_KEY]',
-  voiceId: '[VOICE_ID]'
+  publishableKey: 'sb_publishable_[KEY]'  // Nueva clave, NO usar anonKey
 };
 ```
 
-Para producción en GitHub Pages, inyectar via GitHub Secrets → Actions → index.html.
+### Producción (GitHub Pages)
+`deploy.yml` inyecta secrets desde Infisical y genera `src/env.js` durante el build.
+Solo se necesitan dos GitHub Secrets en el repo:
+- `INFISICAL_CLIENT_ID`
+- `INFISICAL_CLIENT_SECRET`
 
 **Nunca commitear keys reales. Nunca.**
 
