@@ -12,15 +12,21 @@
 - ✅ GitHub Pages deployment
 
 ## v0.2 — Mejoras UX (Mayo 2026)
-- [ ] Service Worker — funcionalidad offline completa
-- [ ] Notificaciones push nativas (Web Push API)
-- [ ] Audio pregrabado para todos los slots del protocolo
-- [ ] Soporte SpO2 en registro de vitales
-- [ ] Modo nocturno automático (detectar hora del dispositivo)
-- [ ] Vibración háptica en confirmación de medicamento
+- ✅ Service Worker — funcionalidad offline completa
+- ✅ Notificaciones push nativas (Web Push API + cron GitHub Actions)
+- ✅ Audio pregrabado para todos los slots del protocolo (ElevenLabs, voz Valentina)
+- ✅ Soporte SpO2 en registro de vitales
+- ✅ Modo nocturno automático (detectar hora del dispositivo)
+- ✅ Vibración háptica en confirmación de medicamento
+- ✅ CI pipeline (Jest 78 tests + Playwright 42 tests E2E)
+- ✅ Secrets management via Infisical (env-slug: dev)
+- ✅ Deploy automático a GitHub Pages via GitHub Actions
+- [ ] Supabase Edge Function `send-push` deployada en producción
+- [ ] VAPID secrets cargados en Supabase dashboard
+- [ ] Verificar push notifications end-to-end en Android
 
 ## v0.3 — Voz de alta calidad (Junio 2026)
-- [ ] Integración ElevenLabs configurada para Nelson
+- ✅ Integración ElevenLabs — voz Valentina (VR6AewLTigWG4xSOukaG), multilingual v2
 - [ ] Panel de administración para configurar API key sin tocar código
 - [ ] Grabación de audio pregrabado desde el dispositivo (cuidador graba)
 - [ ] Reconocimiento de voz básico (sí/no para confirmaciones)
