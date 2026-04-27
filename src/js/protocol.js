@@ -10,6 +10,14 @@ const Protocol = (() => {
     try {
       const res = await fetch('protocol.json');
       _protocol = await res.json();
+      // Ordenar slots por time en cada día (fix: 2026-04-25 tiene 12:30 antes de 12:00)
+      if (_protocol.days) {
+        Object.values(_protocol.days).forEach(day => {
+          if (day.slots) {
+            day.slots.sort((a, b) => timeToMin(a.time) - timeToMin(b.time));
+          }
+        });
+      }
       window._protocolData = _protocol; // para exportCSV
       // Hydrate from cloud se hace en background sin bloquear UI
       if (typeof DB !== 'undefined' && DB) DB.hydrateFromCloud(todayStr()).catch(e => console.warn('[DB] hydrate:', e));
@@ -52,6 +60,48 @@ const Protocol = (() => {
     return null;
   }
 
+  function getRituals(dateStr) {
+    const day = getDay(dateStr);
+    if (!day) return [];
+    const ritualMap = {};
+    for (const slot of day.slots || []) {
+      if (!ritualMap[slot.time]) {
+        ritualMap[slot.time] = { time: slot.time, steps: [] };
+      }
+      ritualMap[slot.time].steps.push(slot);
+    }
+    return Object.values(ritualMap).sort((a, b) => timeToMin(a.time) - timeToMin(b.time));
+  }
+
+  function getCurrentRitual(now) {
+    const dateStr = now.toISOString().slice(0, 10);
+    const nowMin = now.getHours() * 60 + now.getMinutes();
+    const rituals = getRituals(dateStr);
+    let current = null;
+    for (const ritual of rituals) {
+      if (timeToMin(ritual.time) <= nowMin) current = ritual;
+    }
+    return current;
+  }
+
+  function getCurrentStep(ritual) {
+    if (!ritual || !ritual.steps) return null;
+    for (const step of ritual.steps) {
+      if (!DB.isChecked(step.id, 0)) return step;
+    }
+    return null;
+  }
+
+  function getNextRitual(now) {
+    const dateStr = now.toISOString().slice(0, 10);
+    const nowMin = now.getHours() * 60 + now.getMinutes();
+    const rituals = getRituals(dateStr);
+    for (const ritual of rituals) {
+      if (timeToMin(ritual.time) > nowMin) return ritual;
+    }
+    return null;
+  }
+
   function isChecked(slotId, medIdx) {
     return DB.isChecked(slotId, medIdx);
   }
@@ -84,6 +134,7 @@ const Protocol = (() => {
 
   return {
     load, getDay, getCurrentSlot, getNextSlot,
+    getRituals, getCurrentRitual, getCurrentStep, getNextRitual,
     timeToMin, isChecked, toggleCheck,
     saveVital, getVital, exportCSV
   };
